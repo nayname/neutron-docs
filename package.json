@@ -5,7 +5,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "mintlify dev",
+    "dev": "PORT=1956 mintlify dev",
     "broken-links": "mintlify broken-links",
     "mcp-server": "node mcp-server.js"
   },

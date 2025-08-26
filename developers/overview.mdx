@@ -3,6 +3,8 @@ title: "Developer Portal"
 icon: "code"
 ---
 
+import { NLQueryPlugin } from '/snippets/nl-query-plugin.jsx'
+
 Neutron provides developers with a powerful set of native modules, features, and tools to build sophisticated DeFi applications with unparalleled capital efficiency and atomic composability.
 
 ## Documentation Structure
@@ -17,11 +19,11 @@ Our developer documentation follows the [Divio documentation system](https://doc
   <Card title="Tutorials" icon="book-open" href="/developers/tutorials/overview">
     Step-by-step learning experiences to build your first applications on Neutron.
   </Card>
-  
+
   <Card title="Module Explanations" icon="cubes" href="/developers/modules/overview">
     Technical documentation for Neutron's specialized modules and features.
   </Card>
-  
+
   <Card title="Concepts" icon="puzzle-piece" href="/concepts/integrated-architecture">
     Explanations of how Neutron's architecture and features work.
   </Card>
@@ -33,7 +35,7 @@ Our developer documentation follows the [Divio documentation system](https://doc
   <Card title="Cosmopark Development Environment" icon="cubes" href="/developers/tutorials/onboarding/cosmopark">
     Set up a complete local development environment with interconnected Neutron and Gaia nodes, IBC relayers, and Neutron ICQ relayer for testing cross-chain features.
   </Card>
-  
+
   <Card title="CosmWasm Smart Contracts" icon="code" href="/developers/tutorials/introduction_to_cosmwasm">
     Learn how to create, test, and deploy smart contracts on Neutron with step-by-step tutorials.
   </Card>
@@ -45,13 +47,13 @@ Our developer documentation follows the [Divio documentation system](https://doc
   <Card title="Neutron SDK" icon="box" href="https://github.com/neutron-org/neutron-sdk" target="_blank">
     TypeScript and Go SDKs with comprehensive tooling for building applications, including helpers for native modules, IBC operations, and smart contract deployment.
   </Card>
-  
+
   <Card title="SDK & Developer Tools" icon="toolbox" href="/developers/sdk">
     Complete collection of official SDKs, templates, boilerplates, and scaffolding tools for rapid development on Neutron.
   </Card>
 </CardGroup>
 
-**Third-party Tools**: Additional development options include [WasmKit](/developers/tutorials/cosmwasm_wasmkit) for CosmWasm development and [Remix IDE](/developers/tutorials/cosmwasm_remix) for web-based development environments.
+**Third-pppparty Tools**: Additional development options include [WasmKit](/developers/tutorials/cosmwasm_wasmkit) for CosmWasm development and [Remix IDE](/developers/tutorials/cosmwasm_remix) for web-based development environments.
 
 <Card className="mt-6">
   <div className="flex items-center">
@@ -65,4 +67,8 @@ Our developer documentation follows the [Divio documentation system](https://doc
       <strong>Need help?</strong> Join our <a href="https://discord.com/invite/bzPBzbDvWC" className="text-primary hover:underline">Discord</a> and check out the #developers channel for support from the Neutron team and community.
     </div>
   </div>
-</Card> 
+</Card>
+
+<Panel>
+  <NLQueryPlugin />
+</Panel>
