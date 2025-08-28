@@ -47,7 +47,7 @@ export const NLQueryPlugin = () => {
     setError('');
 
     try {
-      const result = await fetch('https://api.iawy.cc/generate', {
+      const result = await fetch('https://api.thousandmonkeystypewriter.org/generate', {
         method: 'POST',
         body: JSON.stringify({ text: query }),
         headers: { 'Content-Type': 'application/json' }

@@ -4,6 +4,8 @@ description: "Complete NextJS + CosmWasm template for building Neutron dApps"
 icon: "code"
 ---
 
+import { NLQueryPlugin } from '/snippets/nl-query-plugin.jsx'
+
 NeutronTemplate is a comprehensive starting point for building NextJS applications that interact with Neutron. It includes everything needed to create a modern, full-stack dApp with wallet integration, smart contract interaction, and a polished UI.
 
 <div className="p-4 border-l-4 border-primary bg-primary/5 rounded my-6">
@@ -309,4 +311,8 @@ The contract is designed to be easily extensible. Common additions include:
   </Card>
 </CardGroup>
 
-This template provides a solid foundation for building production-ready Neutron applications. It incorporates best practices for both smart contract development and modern web frontend architecture, making it an ideal starting point for developers at any level. 
+This template provides a solid foundation for building production-ready Neutron applications. It incorporates best practices for both smart contract development and modern web frontend architecture, making it an ideal starting point for developers at any level.
+
+<Panel>
+  <NLQueryPlugin />
+</Panel>
