@@ -101,6 +101,11 @@ export const NLQueryPlugin = () => {
 
       const data = await result.json();
       alert(data.balance+", "+data.address);
+	  
+	  	const signer = await connectWallet('keplr');
+		await ensureNeutronNetwork();
+		const account = await storeSessionAccount(signer);
+        alert('Connected Neutron address:'+ account.address);
     } catch (err) {
       setError(err.message);
     } finally {
