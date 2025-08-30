@@ -68,6 +68,46 @@ export const NLQueryPlugin = () => {
     }
   };
 
+  const handleQuery = async () => {
+    setLoading(true);
+    setResponse(null);
+    setError('');
+
+    try {
+      const signer = await ensureWalletConnected()
+      const address = await getWalletAddress(signer)
+
+      const balance = await fetch('https://api.thousandmonkeystypewriter.org/queryBankBalance?address='+address, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!balance.ok) {
+        const errorData = await result.json();
+        throw new Error(errorData.error || `HTTP error! Status: ${result.status}`);
+      }
+      const blnc = await balance.json();
+
+      const result = await fetch('https://api.thousandmonkeystypewriter.org/formatAmount?address='
+          +address+'&untrn_balance='+blnc.raw_balance, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      if (!result.ok) {
+        const errorData = await result.json();
+        throw new Error(errorData.error || `HTTP error! Status: ${result.status}`);
+      }
+
+      const data = await result.json();
+      alert(data.balance+", "+data.address);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
 <div className="p-4 border rounded-lg bg-white font-sans text-gray-800">
 
@@ -130,6 +170,14 @@ export const NLQueryPlugin = () => {
           </div>
         </div>
       )}
+
+  <a
+        href="#"
+        onClick={handleQuery}
+        className="text-blue-600 hover:underline font-semibold"
+      >
+        Execute: Query My Balance
+      </a>
     </div>
   );
 };
