@@ -74,38 +74,45 @@ export const NLQueryPlugin = () => {
     setError('');
 
     try {
-      const signer = await ensureWalletConnected()
-      const address = await getWalletAddress(signer)
+        const signer = await ensureWalletConnected();//step: 1 Tool: ensure_wallet_connected Desciption: Confirm the user\u2019s wallet session is active.",
+        const senderAddress = await getWalletAddress(signer);//step: 2 Tool: get_sender_address Desciption: Retrieve the depositor\u2019s Neutron address.",
+        await validateAddressFormat("neutron1n9xk0jk2pznv085yevpg778kxqeq3scm6yhy332jk9cmteqlv0as5gl6p8");//step: 3 Tool: validate_contract_address Desciption: Ensure the provided contract address is a valid Neutron CosmWasm address.",
+        const funds = convertToBaseUnits(100);  // \u2192 \"100000000\"//step: 4 Tool: convert_to_base_units Desciption: Convert 100 NTRN to 100 000 000 untrn.",
+        const execMsg = constructTxWasmExecute(senderAddress, contractAddress, { deposit: {} }, [{ amount: funds, denom: 'untrn' }]);//step: 5 Tool: construct_tx_wasm_execute Desciption: Create a `MsgExecuteContract` with `{ \"deposit\": {} }` as the message payload and attach 100 000 000 untrn as funds.",
+        const txHash = await signAndBroadcast(signer, senderAddress, [execMsg], 'auto');//step: 6 Tool: sign_and_broadcast_tx Desciption: Prompt the wallet to sign and broadcast the execution transaction."
 
-      const balance = await fetch('https://api.thousandmonkeystypewriter.org/queryBankBalance?address='+address, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-      });
+        // const signer = await ensureWalletConnected()
+      // const address = await getWalletAddress(signer)
+      //
+      // const balance = await fetch('https://api.thousandmonkeystypewriter.org/queryBankBalance?address='+address, {
+      //   method: 'GET',
+      //   headers: { 'Content-Type': 'application/json' }
+      // });
+      //
+      // if (!balance.ok) {
+      //   const errorData = await result.json();
+      //   throw new Error(errorData.error || `HTTP error! Status: ${result.status}`);
+      // }
+      // const blnc = await balance.json();
+      //
+      // const result = await fetch('https://api.thousandmonkeystypewriter.org/formatAmount?address='
+      //     +address+'&untrn_balance='+blnc.raw_balance, {
+      //   method: 'GET',
+      //   headers: { 'Content-Type': 'application/json' }
+      // });
+      //
+      // if (!result.ok) {
+      //   const errorData = await result.json();
+      //   throw new Error(errorData.error || `HTTP error! Status: ${result.status}`);
+      // }
+      //
+      // const data = await result.json();
+      // alert(data.balance+", "+data.address);
 
-      if (!balance.ok) {
-        const errorData = await result.json();
-        throw new Error(errorData.error || `HTTP error! Status: ${result.status}`);
-      }
-      const blnc = await balance.json();
-
-      const result = await fetch('https://api.thousandmonkeystypewriter.org/formatAmount?address='
-          +address+'&untrn_balance='+blnc.raw_balance, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-      });
-
-      if (!result.ok) {
-        const errorData = await result.json();
-        throw new Error(errorData.error || `HTTP error! Status: ${result.status}`);
-      }
-
-      const data = await result.json();
-      alert(data.balance+", "+data.address);
-	  
-	  	const signer = await connectWallet('keplr');
-		await ensureNeutronNetwork();
-		const account = await storeSessionAccount(signer);
-        alert('Connected Neutron address:'+ account.address);
+// 	  	const signer = await connectWallet('keplr');
+// 		await ensureNeutronNetwork();
+// 		const account = await storeSessionAccount(signer);
+//         alert('Connected Neutron address:'+ account.address);
     } catch (err) {
       setError(err.message);
     } finally {
