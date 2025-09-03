@@ -196,18 +196,16 @@ export const getOfflineSignerAndAddress = async (chainId = 'neutron-1') => {
  * @throws {Error} If the address is not defined or has an invalid format.
  */
 export const loadContractAddress = () => {
-    const address =
-        import.meta.env.VITE_TEMPLATE_CONTRACT_ADDRESS ||
-        process.env.NEXT_PUBLIC_TEMPLATE_CONTRACT_ADDRESS;
-    if (!address) {
-        throw new Error(
-            'Contract address is not defined in environment variables.'
-        );
-    }
-    if (!/^neutron1[0-9a-z]{38}$/.test(address)) {
-        throw new Error('Invalid Neutron contract address format.');
-    }
-    return address;
+    // const address =
+    //     import.meta.env.VITE_TEMPLATE_CONTRACT_ADDRESS ||
+    //     process.env.NEXT_PUBLIC_TEMPLATE_CONTRACT_ADDRESS;
+    // if (!address) {
+    return "neutron1n9xk0jk2pznv085yevpg778kxqeq3scm6yhy332jk9cmteqlv0as5gl6p8"
+    // }
+    // if (!/^neutron1[0-9a-z]{38}$/.test(address)) {
+    //     throw new Error('Invalid Neutron contract address format.');
+    // }
+    // return "";
 };
 
 /**
@@ -239,7 +237,7 @@ export const getContractAddress = (elementId = 'contract-address-input') => {
  * @returns {Promise<any>} The JSON response from the contract.
  */
 export const queryContractSmart = async (contractAddress, queryMsg) => {
-    const response = await fetch('/api/query-contract', {
+    const response = await fetch('https://api.thousandmonkeystypewriter.org/api/query-contract', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ contractAddress, query: queryMsg }),
@@ -266,10 +264,10 @@ export const queryContractSmart = async (contractAddress, queryMsg) => {
  * @throws {Error} If the backend reports the address is invalid.
  */
 export const validateAddressFormat = async (address) => {
-    const response = await fetch('/api/validate-address', {
+    const response = await fetch('https://api.thousandmonkeystypewriter.org/api/validate-address', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ address }),
+        body: JSON.stringify({ text: address }),
     });
     const result = await response.json();
     if (!response.ok || !result.isValid) {
@@ -301,10 +299,10 @@ export const signAndBroadcast = async (signer, senderAddress, messages, fee, mem
     // the signed bytes to a backend for broadcasting.
     const signedTxBytes = await "/* (Use a library like @cosmjs/stargate to create signed transaction bytes here) */";
 
-    const response = await fetch('/api/broadcast-tx', {
+    const response = await fetch('https://api.thousandmonkeystypewriter.org/api/broadcast-tx', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ signedTxBytes }),
+        body: JSON.stringify({ text: signedTxBytes }),
     });
 
     if (!response.ok) {
@@ -431,6 +429,73 @@ export const suggestNeutronChain = async (wallet) => {
 // export const usePersistWcSession = () => {
 //   alert('Function is not implemented');
 // };
+// // ===================================================================================
+// // == CRON SCHEDULER
+// // ===================================================================================
+
+// Show last execution height for schedule daily_rewards
+export const displayLastExecutionHeight = (height) => {
+    if (height === undefined || height === null) {
+        console.error('Height is not provided.');
+        return;
+    }
+    console.log(`Last execution height: ${height}`);
+    // You can additionally inject this into the DOM, e.g.,
+    // document.getElementById('last-height').textContent = `Last execution height: ${height}`;
+};
+
+
+// Create a cron schedule named "daily_rewards" that distributes rewards every 7,200 blocks at END_BLOCKER
+/* gatherScheduleInputs.js
+ * Helper that can be wired to a form or wizard.
+ */
+export const gatherScheduleInputs = () => {
+    // In a real app you would read these from form fields or a config file.
+    const scheduleName = "daily_rewards";            // Unique schedule identifier
+    const period = 7200;                              // Blocks between executions
+    const executionStage = "EXECUTION_STAGE_END_BLOCKER"; // When to fire (Begin/End block)
+    const targetContract = "neutron1contract...";     // Rewards contract address
+
+    // CosmWasm execute payload that the cron job will run each period
+    const rewardsMsg = {
+        distribute: {}
+    };
+
+    // MsgExecuteContract that the Cron module will invoke
+    const compiledExecuteMsg = {
+        "@type": "/cosmwasm.wasm.v1.MsgExecuteContract",
+        "sender": targetContract,         // will be overwritten by Cron when executed
+        "contract": targetContract,
+        "msg": Buffer.from(JSON.stringify(rewardsMsg)).toString("base64"),
+        "funds": []
+    };
+
+    return {
+        scheduleName,
+        period,
+        executionStage,
+        authority: "neutron1mainDAOaddress...", // DAO (gov) address that controls Cron
+        msgs: [compiledExecuteMsg]
+    };
+};
+
+
+// Remove the cron schedule named "daily_rewards"
+export const constructMsgRemoveSchedule = (authority, name = "daily_rewards") => {
+    if (!authority) {
+        throw new Error("Authority (DAO address) is required");
+    }
+
+    // EncodeObject compatible with CosmJS
+    return {
+        typeUrl: "/neutron.cron.MsgRemoveSchedule",
+        value: {
+            authority,
+            name,
+        },
+    };
+};
+
 
 
 
