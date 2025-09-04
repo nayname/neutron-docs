@@ -271,7 +271,8 @@ export const validateAddressFormat = async (address) => {
     });
     const result = await response.json();
     if (!response.ok || !result.isValid) {
-        throw new Error(result.message || 'Invalid address.');
+//         throw new Error(result.message || 'Invalid address.');
+        return false;
     }
     return true;
     /*
@@ -336,10 +337,10 @@ export const constructWasmQueryMsg = (senderAddress) => {
     // This example is specific to the `get_personal_counter` query.
     // In a real app, you might have multiple, more specific constructors.
     if (!senderAddress) {
-        return { get_global_counter: {} };
+        return { global: {} };
     }
     return {
-        get_personal_counter: { address: senderAddress },
+        user: { user: senderAddress },
     };
 };
 
