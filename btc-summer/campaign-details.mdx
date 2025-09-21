@@ -1,0 +1,135 @@
+---
+title: "Campaign Details"
+description: "Complete guide to BTC Summer campaign mechanics, phases, rewards, and participation requirements"
+icon: "calendar-days"
+---
+
+Bitcoin Summer is a multi-phase campaign in partnership with [Lombard](https://www.lombard.finance/), [EtherFi](https://www.ether.fi/), [Solv](https://solv.finance/), [Bedrock](https://www.bedrock.technology/), [Wrapped Bitcoin](https://wbtc.network/), [Structured](https://structured.money/), [Valence](https://valence.zone/), [Mars](https://marsprotocol.io/), [Amber Finance](https://amberfi.io/), and [Babylon](https://babylonlabs.io/) that brings real yield opportunities to BTC and unlocks leveraged BTC looping for the first time. The campaign distributes up to $10M in NTRN rewards, in addition to partner airdrops, over multiple phases to participants who provide liquidity and engage with Neutron's DeFi protocols.
+
+
+Neutron is uniquely positioned thanks to three innovations:
+
+<CardGroup cols={3}>
+  <Card title="maxBTC" icon="bitcoin" href="https://docs.structured.money/introduction">
+    A high, real yield BTC derivative. MaxBTC has been live for > 230 days with an average BTC APY of ~10% before incentives.
+  </Card>
+  
+  <Card title="Supervaults" icon="vault" href="/defi/supervaults">
+    Advanced automated market makers that leverage in-consensus oracles to protect LPs from loss while offering best execution to traders.
+  </Card>
+  
+  <Card title="AmberFi" icon="fire" href="https://app.amberfi.io/">
+    A secure and efficient isolated lending/borrowing protocol for Bitcoin derivatives. [Documentation →](https://docs.amberfi.io/)
+  </Card>
+</CardGroup>
+
+For users, this campaign represents an opportunity to:
+
+- Earn sustainable risk-adjusted BTC rewards without the hassle of frequently cycling through ecosystem campaigns.
+- Manage your exposure according to your preferences: from most conservative (lending yields) to most aggressive (Leveraged Looped MaxBTC positions).
+
+<Info>
+For detailed reward and incentive mechanics, see [Rewards Guide](/btc-summer/rewards). For important eligibility requirements and campaign terms, please review [Bitcoin Summer Campaign Terms](/legal/terms-and-conditions/bitcoin-summer-campaign).
+</Info>
+
+## Campaign Structure
+
+### Phases & Timeline
+
+The campaign is structured in successive **2-month phases**, with at least 6 phases planned (12+ months total duration). Each phase has predetermined parameters set before launch:
+
+- **Phase Budget**: Dollar value distributed as incentives (e.g., Phase 1: $250,000 in NTRN Rewards)
+- **Eligible Opportunities**: List of participating vaults and protocols
+- **NTRN Reward Multipliers**: Boost mechanisms and qualification criteria
+
+Earlier phases have smaller budgets to account for initial visibility, while later phases scale up to drive broader participation.
+
+<Frame>
+  <img src="/images/epoch.png" alt="Breakdown of campaign timeline and epochs" />
+</Frame>
+
+---
+
+## How Rewards Work
+
+The campaign rewards actual **DeFi positions on Neutron**, not just vault deposits. This means:
+
+- **Vault participants** receive pro-rata shares of rewards earned by their vault's underlying positions
+- **Direct participants** earn rewards by depositing directly into eligible Neutron protocols
+- **Tiered accounting** ensures fair distribution across multiple layers of deposits
+
+Whether you deposit through Ethereum vaults or directly on Neutron, you're earning rewards from the same underlying DeFi positions.
+
+### Dollar-Denominated Rewards
+
+Unlike traditional token farming, rewards are calculated in **dollar terms** throughout each phase and converted to NTRN tokens at phase end based on the final NTRN price.
+
+**Example:**
+- Alice deposits 1 BTC ($100,000) at phase start
+- Earns $1,660 in rewards over 2 months (~10% APR)
+- At phase end, if NTRN = $1, Alice receives ~1,660 NTRN tokens
+
+This structure means campaign costs decrease if NTRN price appreciates, aligning incentives with network growth.
+
+<AccordionGroup>
+  <Accordion title="Points System">
+    Rewards use a points-based accounting system to ensure fair distribution:
+
+    $$
+    \text{Points} = \text{USD Value of Deposit} \times \text{Days Staked} \times (1 + \text{Bonus Multipliers})
+    $$
+
+    - **Daily Calculation**: Points accrue daily based on USD deposit value  
+    - **Pro-rata Distribution**: Phase budget distributed proportionally to total points earned
+    - **Bonus Multipliers**: Additional rewards for advanced strategies ([learn more](/btc-summer/rewards#understanding-multipliers))
+    - **Protection from Dilution**: Daily calculation locks in dollar-denominated rewards
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Reward Claiming & Vesting
+
+After each Bitcoin Summer phase ends, participants have three options to claim NTRN rewards:
+
+1. **Boost & Earn Staking Rewards**: Stake and lock instantly to boost NTRN rewards in upcoming phases by up to 3x and earn NTRN staking rewards
+2. **Instant Claim**: Instantly claim 50% and forfeit the other 50%
+3. **Standard Vesting**: Vest over 2 months to claim the full amount
+
+The vesting mechanism promotes long-term ecosystem participation and prevents sudden token supply releases.
+
+---
+
+## Vault Rewards Model
+
+### Soft-Lock Structure
+
+Campaign vaults use a "forfeitable" reward structure to encourage full phase participation:
+
+| Component | Terms | Details |
+| --------- | ----- | ------- |
+| Principal | No lockup | Your principal remains fully liquid at all times. |
+| DeFi Rewards | No lockup | Market making spreads and lending yields are automatically compounded into your position and can be withdrawn at any time. |
+| NTRN Rewards | Forfeitable | Withdrawing mid-Phase forfeits that Phase's rewards. |
+| Partner Aidrops | No lockup by default | In general, BTC LST Issuers do not enforce forfeitable incentives. We encourage you to reach out to the relevant asset issuers to confirm their approach. |
+
+**Example**: If you deposit 10 BTC at phase start but withdraw 5 BTC mid-phase, you forfeit rewards corresponding to the withdrawn amount.
+
+Learn more about NTRN multipliers in [Boost Mechanisms & Multipliers](/btc-summer/rewards#understanding-multipliers)
+
+---
+
+## Choose Your Participation Path
+
+<CardGroup cols={2}>
+  <Card title="Coming from Ethereum" icon="ethereum" href="/btc-summer/ethereum-path">
+    **Best for**: Simple exposure with MetaMask and EVM wallets. 
+    Automated vault strategies with deposits bridged to Neutron DeFi.
+  </Card>
+  
+  <Card title="Native Neutron" icon={<svg width="16" height="16" viewBox="0 0 357.21 376.34" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M41.34.71c-4.54-2.63-9.53,2.59-6.72,6.99l84.33,132.81c2.45,3.81-1.63,8.44-5.76,6.54L5.3,96.94c-3.68-1.68-7.04,2.86-4.31,5.85l69.22,82.2c1.54,1.86,1.54,4.54,0,6.35L.99,273.55c-2.68,3,.64,7.53,4.31,5.85l107.94-50.11c4.13-1.91,8.17,2.72,5.76,6.54l-84.33,132.81c-2.81,4.4,2.22,9.62,6.72,6.99l312.42-181.56c4.54-2.63,4.54-9.21,0-11.8L41.34.71Z" fill="currentColor"/></svg>} href="/btc-summer/neutron-path">
+    **Best for**: Maximum control and advanced features
+    Use Keplr, Leap, or Cosmostation wallets. Direct protocol interaction with immediate boost access and higher reward potential.
+  </Card>
+</CardGroup>
+

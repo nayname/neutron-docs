@@ -1,0 +1,89 @@
+---
+title: "Integrators Guide"
+description: "Integration guide for developers and partners building on BTC Summer infrastructure"
+icon: "plug"
+---
+
+This guide provides technical specifications for developers and partners integrating with the BTC Summer campaign infrastructure.
+
+---
+
+## Points API Integration
+
+<Warning>
+The Points API is currently in development. Specifications below are preliminary and subject to change.
+</Warning>
+
+### Planned API Structure
+
+**Base URL**: [API endpoint will be announced when available]
+
+**Planned endpoints**:
+- User points and rewards data
+- Campaign status and phase information
+- Eligible protocol and position data
+
+### Current Integration Method
+
+Use standard Neutron blockchain queries:
+- **CosmWasm queries**: For smart contract data
+- **Neutron RPC**: For on-chain state
+- **Event monitoring**: For real-time updates
+
+See [Neutron Developer Documentation](/developers/overview) for integration patterns.
+
+---
+
+## Asset Issuer Integration
+
+### BTC LST Issuer Coordination
+
+Asset issuers can coordinate with the campaign to:
+- Track their asset performance in the campaign
+- Potentially provide additional rewards to users
+- Gain exposure to Neutron's DeFi ecosystem
+
+**Contact**: Reach out through official Neutron channels for coordination.
+
+---
+
+## Address Linking Implementation
+
+### Key Implementation Requirement
+
+Handle cross-chain boost scenarios where:
+- Users deposit via Ethereum vaults (EVM addresses)
+- Users generate boosts via Neutron (NTRN locking)
+- System must coordinate boosts to correct deposit addresses
+
+**Implementation details**: [Address Linking System](/btc-summer/technical/address-linking)
+
+---
+
+## Development Resources
+
+### Neutron Development Tools
+- [Neutron Developer Documentation](/developers/overview)
+- [Smart Contract Tutorials](/developers/tutorials/introduction_to_cosmwasm)
+- [SDK and Tools](/developers/sdk)
+- [Integration Examples](/developers/tutorials/overview)
+
+### BTC Summer Specific
+- **GitHub repository**: [neutron-points-crawler](https://github.com/neutron-org/neutron-points-crawler/tree/feat/maxbtc-points-contract)
+- **Smart contract interfaces**: Available when contracts are deployed
+
+---
+
+## Support
+
+### Technical Support
+- **Discord**: [Neutron Developer Channel](https://discord.com/invite/bzPBzbDvWC)
+- **Documentation**: Complete technical reference available
+
+### Partnership Coordination
+- **Contact**: Through official Neutron channels
+- **Focus**: Technical integration and asset issuer coordination
+
+<Note>
+This integration guide focuses on currently available tools and realistic development timelines. Detailed API specifications will be provided as implementation progresses.
+</Note>

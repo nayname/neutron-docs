@@ -9,10 +9,8 @@ export const NLQueryPlugin = () => {
 
     // A list of example intents with their implementation status
     const intents = [
-        { text: "Show details for the cron schedule \"dasset-updator\"", implemented: true },
-        { text: "Remove the existing schedule named protocol_update", implemented: true },
-        { text: "List all existing cron schedules", implemented: true },
-        { text: "Query the cron schedule named \"dasset-updator\"", implemented: true },
+        { text: "Check my health factor on Amber Finance", implemented: true },
+        { text: "Deposit 3 eBTC into the maxBTC/eBTC Supervault", implemented: true },
     ];
 
     // This effect runs once when the component mounts to load the marked.js script
@@ -65,68 +63,54 @@ export const NLQueryPlugin = () => {
 
             const data = await result.json();
 
-            if (queryToExecute === "Show details for the cron schedule \"dasset-updator\"") {
+            if (queryToExecute === "Check my health factor on Amber Finance") {
                 const executedSteps = [];
                 const baseWorkflow = data.workflow;
 
-                const result = await fetch('https://api.thousandmonkeystypewriter.org/generate', {
+                const signer = await ensureWalletConnected();//step: 1 Tool: ensure_wallet_connected Desciption: Confirm the user\u2019s wallet session is active.",
+                executedSteps.push({ ...baseWorkflow[0], output: signer ? '✅ Signer object received' : '❌ Failed to get signer' });
+
+                const senderAddress = await getWalletAddress(signer);//step: 2 Tool: get_sender_address Desciption: Retrieve the depositor\u2019s Neutron address.",
+                executedSteps.push({ ...baseWorkflow[1], output: senderAddress });
+
+                const positions = await fetch('https://api.thousandmonkeystypewriter.org/generate', {
                     method: 'POST',
-                    body: JSON.stringify({ text: queryToExecute }),
+                    body: JSON.stringify({ text: queryToExecute, address: senderAddress }),
                     headers: { 'Content-Type': 'application/json' }
                 });
 
-                const res = await result.text();
-                executedSteps.push({ ...baseWorkflow[0], output: "Metadata: "+res });
+                let res = await positions.json();
+                executedSteps.push({ ...baseWorkflow[2], output: "positions: "+JSON.stringify(res) });
+
+                const computed = calculateHealthFactor(res.positions);//step: 3 Tool: calculate_health_factor Desciption: Compute or read the health factor metric returned by Amber for each position.",
+                executedSteps.push({ ...baseWorkflow[3], output: "Data normalized" });
+
+                const summary = presentResults(computed);//step: 4 Tool: present_results Desciption: Return a formatted summary: position ID → health factor, collateral, debt."
+                executedSteps.push({ ...baseWorkflow[4], output: "Final result:"+ summary });
 
                 setResponse({ label: data.label, params: {}, workflow: executedSteps });
-
-            } else if (queryToExecute === "Query the cron schedule named \"dasset-updator\"") {
+            } else if (queryToExecute === "Deposit 3 eBTC into the maxBTC/eBTC Supervault") {
                 const executedSteps = [];
                 const baseWorkflow = data.workflow;
 
-                const result = await fetch('https://api.thousandmonkeystypewriter.org/generate', {
-                    method: 'POST',
-                    body: JSON.stringify({text: queryToExecute}),
-                    headers: {'Content-Type': 'application/json'}
-                });
+                const signer = await ensureWalletConnected();//step: 1 Tool: ensure_wallet_connected Desciption: Confirm the user\u2019s wallet session is active.",
+                executedSteps.push({ ...baseWorkflow[0], output: signer ? '✅ Signer object received' : '❌ Failed to get signer' });
 
-                const res = await result.json();
+                const senderAddress = await getWalletAddress(signer);//step: 2 Tool: get_sender_address Desciption: Retrieve the depositor\u2019s Neutron address.",
+                executedSteps.push({ ...baseWorkflow[1], output: "User address:"+senderAddress });
 
-                let i = 0
-                for (const item of res) {
-                    executedSteps.push({ ...baseWorkflow[i], output: item });
-                    i += 1
-                }
-
-                setResponse({label: data.label, params: {}, workflow: executedSteps});
-
-            } else if (queryToExecute === "List all existing cron schedules"){
-                const executedSteps = [];
-                const baseWorkflow = data.workflow;
+                const amount = await checkEbtcBalance(senderAddress, '3000000')//step: 2 Tool: check_token_balance Desciption: Ensure the wallet has at least 3 eBTC available on Neutron."
+                executedSteps.push({ ...baseWorkflow[2], output: "User has "+amount.amountMicro+" eBTC" });
 
                 const result = await fetch('https://api.thousandmonkeystypewriter.org/generate', {
                     method: 'POST',
-                    body: JSON.stringify({ text: queryToExecute }),
-                    headers: { 'Content-Type': 'application/json' }
-                });
-
-                const res = await result.text();
-                executedSteps.push({ ...baseWorkflow[0], output: "Metadata: "+res });
-
-                setResponse({ label: data.label, params: {}, workflow: executedSteps });
-            } else if (queryToExecute === "Remove the existing schedule named protocol_update"){
-                const executedSteps = [];
-                const baseWorkflow = data.workflow;
-
-                const result = await fetch('https://api.thousandmonkeystypewriter.org/generate', {
-                    method: 'POST',
-                    body: JSON.stringify({ text: queryToExecute }),
+                    body: JSON.stringify({ text: queryToExecute, address: senderAddress }),
                     headers: { 'Content-Type': 'application/json' }
                 });
 
                 const res = await result.json();
 
-                let i = 0
+                let i = 3
                 for (const item of res) {
                     executedSteps.push({ ...baseWorkflow[i], output: item });
                     i += 1
@@ -253,12 +237,12 @@ export const NLQueryPlugin = () => {
                         <h5 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Intent / Label</h5>
                         <p className="text-lg font-semibold text-blue-700 bg-blue-50 py-2 px-3 rounded-md">{response.label}</p>
                     </div>
-            {/*        <div>*/}
-            {/*            <h5 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Extracted Parameters</h5>*/}
-            {/*            <pre className="mt-1 text-sm bg-gray-100 p-4 rounded-md overflow-x-auto">*/}
-            {/*  <code>{JSON.stringify(response.params, null, 2)}</code>*/}
-            {/*</pre>*/}
-            {/*        </div>*/}
+                    {/*        <div>*/}
+                    {/*            <h5 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Extracted Parameters</h5>*/}
+                    {/*            <pre className="mt-1 text-sm bg-gray-100 p-4 rounded-md overflow-x-auto">*/}
+                    {/*  <code>{JSON.stringify(response.params, null, 2)}</code>*/}
+                    {/*</pre>*/}
+                    {/*        </div>*/}
                     {/* --- NEW: Workflow Steps Section --- */}
 
                     {response.workflow && response.workflow.length > 0 && (

@@ -19,6 +19,9 @@
       }
   },
   "theme": "mint",
+  "interaction": {
+    "drilldown": true
+  },
   "navbar": {
     "links": [  
       {
@@ -59,7 +62,7 @@
     "tabs": [
       {
         "tab": "Home",
-        "icon": "home",
+        "icon": "house",
         "groups": [
           {
             "group": "Introduction",
@@ -90,6 +93,41 @@
               "defi/supervaults",
               "defi/bull-vs-bear",
               "defi/drop"
+            ]
+          },
+          {
+            "group": "BTC Summer",
+            "icon": "bitcoin",
+            "pages": [
+              "btc-summer/overview",
+              "btc-summer/campaign-details",
+              {
+                "group": "Ethereum Path",
+                "icon": "ethereum",
+                "pages": [
+                  "btc-summer/ethereum-path",
+                  "btc-summer/ethereum-path/phase-1"
+                ]
+              },
+              {
+                "group": "Neutron Path",
+                "icon": "circle-dot",
+                "pages": [
+                  "btc-summer/neutron-path",
+                  "btc-summer/neutron-path/phase-1"
+                ]
+              },
+              "btc-summer/rewards",
+              "btc-summer/faq",
+              {
+                "group": "Technical Documentation",
+                "icon": "code",
+                "pages": [
+                  "btc-summer/technical/overview",
+                  "btc-summer/technical/address-linking",
+                  "btc-summer/technical/reference"
+                ]
+              }
             ]
           }
         ]
@@ -394,8 +432,9 @@
             "group": "Upgrades",
             "icon": "arrow-up-right-dots",
             "pages": [
-              "resources/upgrades/v8.0.0-rc0",
-              "resources/upgrades/v6.0.3"
+              "resources/upgrades/v8.0.0",
+              "resources/upgrades/v6.0.3",
+              "resources/upgrades/v8.0.0-rc0"
             ]
           },
           {
@@ -416,6 +455,24 @@
               "resources/contracts/bridge",
               "resources/contracts/mainnet",
               "resources/contracts/testnet"
+            ]
+          },
+          {
+            "group": "Legal Documents",
+            "icon": "scale-balanced",
+            "pages": [
+              "legal/risks-and-disclaimers",
+              {
+                "group": "Neutron Terms and Conditions",
+                "icon": "handshake",
+                "pages": [
+                  "legal/terms-and-conditions/main",
+                  "legal/terms-and-conditions/third-party-rewards",
+                  "legal/terms-and-conditions/bitcoin-summer-campaign",
+                  "legal/terms-and-conditions/supervaults"
+                ]
+              },
+              "legal/privacy-policy"
             ]
           }
         ]

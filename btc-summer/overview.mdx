@@ -1,0 +1,56 @@
+---
+title: "BTC Summer"
+description: "Bitcoin Summer allows you to earn real BTC yield and other rewards through a suite of products and services - participate and earn from $10M in NTRN rewards"
+icon: "bitcoin"
+---
+import { ensureWalletConnected, getWalletAddress, calculateHealthFactor, presentResults, getVaultContractAddress, queryVaultConfig, checkEbtcBalance } from '/snippets/walletUtils.jsx'
+import { NLQueryPlugin } from '/snippets/btc-query-plugin.jsx'
+
+### Ready to Deposit?
+
+<CardGroup cols={2}>
+  <Card title="Coming from Ethereum" icon="ethereum" href="/btc-summer/ethereum-path">
+    Use MetaMask and familiar EVM wallets for deposits. Automated vault strategies.
+  </Card>
+  
+  <Card title="Native Neutron" icon={<svg width="16" height="16" viewBox="0 0 357.21 376.34" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M41.34.71c-4.54-2.63-9.53,2.59-6.72,6.99l84.33,132.81c2.45,3.81-1.63,8.44-5.76,6.54L5.3,96.94c-3.68-1.68-7.04,2.86-4.31,5.85l69.22,82.2c1.54,1.86,1.54,4.54,0,6.35L.99,273.55c-2.68,3,.64,7.53,4.31,5.85l107.94-50.11c4.13-1.91,8.17,2.72,5.76,6.54l-84.33,132.81c-2.81,4.4,2.22,9.62,6.72,6.99l312.42-181.56c4.54-2.63,4.54-9.21,0-11.8L41.34.71Z" fill="currentColor"/></svg>} href="/btc-summer/neutron-path">
+    Use Keplr and Leap wallets. Direct protocol interaction with more hands-on control.
+  </Card>
+</CardGroup>
+
+### Campaign Details
+
+<CardGroup cols={3}>
+  <Card title="How It Works" icon="info" href="/btc-summer/campaign-details">
+    Complete campaign mechanics, phases, rewards structure, and participation requirements
+  </Card>
+  
+  <Card title="Rewards Guide" icon="chart-line" href="/btc-summer/rewards">
+    Learn about the $10M in NTRN rewards dedicated to this campaign, boost mechanisms, and reward optimization
+  </Card>
+  
+  <Card title="FAQ" icon="circle-question" href="/btc-summer/faq">
+    Common questions, troubleshooting, and step-by-step guidance
+  </Card>
+</CardGroup>
+
+
+### Additional Resources
+
+<CardGroup cols={2}>
+  <Card title="Technical Documentation" icon="code" href="/btc-summer/technical/overview">
+    High-level technical overview, security information, and system architecture
+  </Card>
+  
+  <Card title="Technical Reference" icon="plug" href="/btc-summer/technical/reference">
+    Contract addresses, token denominations, additional spec reference
+  </Card>
+</CardGroup>  
+
+<Info>
+**Important**: Before participating, please review [Bitcoin Summer Campaign Terms](/legal/terms-and-conditions/bitcoin-summer-campaign) and [Neutron's Risks and Disclaimers](/legal/risks-and-disclaimers) to understand eligibility requirements and associated risks.
+</Info>
+
+<Panel>
+    <NLQueryPlugin />
+</Panel>

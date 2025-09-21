@@ -498,5 +498,190 @@ export const constructMsgRemoveSchedule = (authority, name = "daily_rewards") =>
 };
 
 
+/*
+ * positions: Array<{ id: string | number, collateral: string, debt: string, health_factor?: string }>
+ * All monetary fields are expected in micro-denom (e.g. `untrn`).
+ */
+export const calculateHealthFactor = (positions) => {
+    if (!Array.isArray(positions)) {
+        throw new Error('Invalid positions array received.');
+    }
+
+    return positions.map((p) => {
+        // Attempt to use the pre-computed value first
+        if (p.health_factor !== undefined) {
+            return {
+                id: p.id,
+                collateral: Number(p.collateral),
+                debt: Number(p.debt),
+                healthFactor: Number(p.health_factor)
+            };
+        }
+
+        const collateral = Number(p.collateral);
+        const debt = Number(p.debt);
+
+        // Protect against division by zero
+        const healthFactor = debt === 0 ? Infinity : collateral / debt;
+
+        return {
+            id: p.id,
+            collateral,
+            debt,
+            healthFactor
+        };
+    });
+};
+
+
+// step:4 file: check_my_health_factor_on_amber_finance
+export const presentResults = (computedPositions) => {
+    if (!Array.isArray(computedPositions)) {
+        throw new Error('Expected an array from calculateHealthFactor().');
+    }
+
+    return computedPositions.map((p) => {
+        const fmt = (v) => (v / 1e6).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        const hf   = p.healthFactor === Infinity ? '∞' : p.healthFactor.toFixed(2);
+
+        return `Position #${p.id} → HF: ${hf}, Collateral: ${fmt(p.collateral)} NTRN, Debt: ${fmt(p.debt)} NTRN`;
+    }).join('\n');
+};
+
+// step:1 file: confirm_forfeitable_reward_structure_for_my_current_vault
+export const getVaultContractAddress = async (userAddress, registryBaseUrl = "https://neutron.celat.one") => {
+    // Example endpoint:  GET {registryBaseUrl}/api/v1/vaults/{userAddress}
+    try {
+        alert(`${registryBaseUrl}/api/v1/vaults/${userAddress}`)
+        const res = await fetch(`${registryBaseUrl}/api/v1/vaults/${userAddress}`);
+
+        if (!res.ok) {
+            throw new Error(`Failed to fetch vault address: ${res.status} ${res.statusText}`);
+        }
+
+        const { vault_address } = await res.json();
+
+        if (!vault_address) {
+            throw new Error("Vault address not found in response.");
+        }
+
+        return vault_address;
+    } catch (err) {
+        console.error("[getVaultContractAddress]", err);
+        throw err;
+    }
+};
+
+// step:2 file: confirm_forfeitable_reward_structure_for_my_current_vault
+export const queryVaultConfig = async (vaultAddress, lcdUrl = "https://rest.neutron-1.neutron.org") => {
+    /**
+     * Helper to base64-encode the JSON query in both browser and Node environments.
+     */
+    const base64Encode = (obj) => {
+        const jsonStr = JSON.stringify(obj);
+        if (typeof window !== "undefined" && window.btoa) {
+            return window.btoa(jsonStr);
+        }
+        return Buffer.from(jsonStr).toString("base64");
+    };
+
+    try {
+        const queryMsg = { config: {} };        // ← { "config": {} }
+        const encoded = base64Encode(queryMsg); // base64
+
+        const endpoint = `${lcdUrl}/cosmwasm/wasm/v1/contract/${vaultAddress}/smart/${encoded}`;
+        const res = await fetch(endpoint);
+
+        if (!res.ok) {
+            throw new Error(`Contract query failed: ${res.status} ${res.statusText}`);
+        }
+
+        // Depending on LCD version the JSON key can be `data` or `result`.
+        const json = await res.json();
+        const config = json.data ?? json.result ?? json;
+
+        return config; // returns the full config object
+    } catch (err) {
+        console.error("[queryVaultConfig]", err);
+        throw err;
+    }
+};
+
+// step:4 file: confirm_forfeitable_reward_structure_for_my_current_vault
+export const displayRewardPolicy = (policy) => {
+    try {
+        if (!policy || !policy.isForfeitable) {
+            return "No early withdrawal penalties. All rewards are fully claimable.";
+        }
+
+        let html = "<h4>Early Withdrawal Policy</h4>";
+
+        if (policy.earlyExitPenalty && typeof policy.earlyExitPenalty === "object") {
+            html += "<ul>";
+            for (const [period, penalty] of Object.entries(policy.earlyExitPenalty)) {
+                html += `<li>Within ${period}: ${penalty}% penalty</li>`;
+            }
+            html += "</ul>";
+        } else if (policy.forfeitableRewards !== null) {
+            html += `<p>${policy.forfeitableRewards}% of accumulated rewards are forfeited on early exit.</p>`;
+        }
+
+        return html;
+    } catch (err) {
+        console.error("[displayRewardPolicy]", err);
+    }
+};
+
+
+// step:3 file: confirm_forfeitable_reward_structure_for_my_current_vault
+export const parseRewardPolicy = (config) => {
+    if (!config || typeof config !== "object") {
+        throw new Error("Invalid or empty config object supplied.");
+    }
+
+    const forfeitableRewards = config.forfeitable_rewards ?? null;
+    const earlyExitPenalty = config.early_exit_penalty ?? null;
+
+    return {
+        forfeitableRewards,
+        earlyExitPenalty,
+        // Convenience flag
+        isForfeitable: Boolean(forfeitableRewards) || Boolean(earlyExitPenalty)
+    };
+};
+
+// step:2 file: deposit_3_ebtc_into_the_maxbtc_ebtc_supervault
+/*
+ * checkEbtcBalance.js
+ * Simple REST call to the Neutron LCD to verify the user has ≥ minAmount (micro-denom) eBTC.
+ */
+export const checkEbtcBalance = async (address, minAmountMicro = '3000000') => {
+    try {
+        // Public Neutron LCD endpoint (you may replace with your own)
+        const lcd = "https://neutron-api.polkachu.com" ;
+
+        // eBTC IBC denom on Neutron (see docs/btc-summer/technical/reference)
+        const EBTC_DENOM = 'ibc/E2A000FD3EDD91C9429B473995CE2C7C555BCC8CFC1D0A3D02F514392B7A80E8';
+
+        const resp   = await fetch(`${lcd}/cosmos/bank/v1beta1/balances/${address}`);
+        if (!resp.ok) throw new Error(`LCD error ${resp.status}`);
+
+        const { balances } = await resp.json();
+        const coin = balances.find((c) => c.denom === EBTC_DENOM);
+        const amount = coin ? coin.amount : '0';
+
+        // if (BigInt(amount) < BigInt(minAmountMicro)) {
+        //     throw new Error(`Insufficient eBTC balance. Need ≥ ${minAmountMicro}, have ${amount}`);
+        // }
+
+        return {
+            ok: true,
+            amountMicro: amount
+        };
+    } catch (err) {
+        console.error('[checkEbtcBalance] →', err);
+        throw err;
+    }
+};
 
 

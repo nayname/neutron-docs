@@ -1,0 +1,142 @@
+---
+title: "Address Linking System"
+description: "Understanding cross-chain address coordination for BTC Summer rewards and boosts"
+icon: "link"
+---
+
+The BTC Summer campaign uses an address linking system to coordinate rewards across different networks. This page explains why you might need to link addresses and how the system works.
+
+<Info>
+This page provides detailed context for users and integrators who want to understand address linking better. The principal how-to sections for users can be found here: [Ethereum Path](/btc-summer/ethereum-path) and [Neutron Path](/btc-summer/neutron-path).
+</Info>
+
+## Why Address Linking Exists
+
+### The Cross-Chain Challenge
+
+BTC Summer allows you to participate in two different ways:
+- **Deposit on Ethereum**: Use familiar wallets like MetaMask with automated vaults
+- **Deposit on Neutron**: Use Cosmos wallets like Keplr for direct protocol access
+
+However, **boost mechanisms only work on Neutron**:
+- **NTRN Locking**: You can only lock NTRN tokens on Neutron
+- **NFT Boosts**: Only Neutron-based NFT collections provide boosts
+
+If you deposit via Ethereum vaults but want to boost your rewards by locking NTRN:
+- Your **deposits** are tracked to your Ethereum address
+- Your **NTRN boost** is generated on your Neutron address
+- The system needs to know these addresses belong to the same person
+
+**Without address linking**: Your boost wouldn't apply to your deposits, and you'd miss out on reward multipliers.
+
+---
+
+## How Address Linking Works
+
+### The "Pointing" System
+
+Instead of trying to automatically guess which addresses belong together, the campaign uses a simple **user-controlled system**:
+
+1. **You explicitly tell the system** which address holds your deposits
+2. **When you create a boost** (by locking NTRN), you "point" it to your deposit address
+3. **The system connects** your Neutron-based boost to your deposit address for reward calculations
+
+This operation of connecting your boost to your deposit address is called "**pointing**."
+
+### When You Need Address Linking
+
+**Ethereum Path Users (Most Common)**:
+- You deposit using MetaMask (Ethereum address)
+- You want to boost rewards by locking NTRN (requires Neutron wallet)
+- **You must point your NTRN boost to your Ethereum deposit address**
+
+**Neutron Path Users**:
+- You deposit using Keplr (Neutron address)
+- You boost with the same Neutron wallet
+- **No linking needed** - everything happens on the same address
+
+**Mixed Scenario**:
+- You have deposits on both Ethereum and Neutron
+- You need to choose which address to boost (you can only boost one at a time)
+
+---
+
+## How the System Works Technically
+
+### Boost Pointer Contract
+
+The campaign uses a smart contract called the "Boost Pointer Contract" that:
+- **Accepts your boost** (NTRN lock receipt NFT)
+- **Records your chosen target address** (where your deposits are)
+- **Calculates your boost multiplier** based on deposits at that address
+- **Applies rewards** to the correct deposit location
+
+### User Experience
+
+**In the Campaign Interface**:
+1. **"Boost this wallet"**: Applies boost to your currently connected Neutron wallet
+2. **"Link an address"**: Lets you specify a different address (like your Ethereum address)
+
+**For Ethereum depositors**: Always use "Link an address" and enter your Ethereum address
+**For Neutron depositors**: Can use "Boost this wallet" since deposits and boosts are on the same network
+
+This approach prioritizes user control over automatic matching - you explicitly decide which address gets boosted, and all boost pointing is recorded on-chain for transparency and verification. NTRN lock NFTs are transferable, but boost benefits follow the NFT holder.
+
+---
+
+## Common Scenarios
+
+<AccordionGroup>
+  <Accordion title="Scenario 1: Ethereum Vault + NTRN Boost">
+    **What you do**:
+    - Deposit to Ethereum vaults using MetaMask
+    - Set up Neutron wallet and acquire NTRN
+    - Lock NTRN and point boost to your Ethereum address
+    - Earn base rewards + boost multiplier
+    
+    **Key point**: You must link your Neutron boost to your Ethereum deposit address.
+  </Accordion>
+
+  <Accordion title="Scenario 2: Direct Neutron + Boost">
+    **What you do**:
+    - Deposit directly to Neutron protocols using Keplr
+    - Lock NTRN from the same Neutron wallet
+    - Boost automatically applies to your Neutron address
+    - Earn base rewards + boost multiplier
+    
+    **Key point**: No linking needed since deposits and boosts are on the same network.
+  </Accordion>
+
+  <Accordion title="Scenario 3: Multiple Addresses">
+    **What you do**:
+    - Choose your primary deposit address
+    - Point all boosts to that one address
+    - Other addresses earn base rewards only
+    - Maximize rewards on your main address
+    
+    **Key point**: You can only boost one address at a time, so consolidation maximizes rewards.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Key Takeaways
+
+**For Users**:
+- Address linking lets you boost deposits made on different networks
+- You must explicitly connect your boosts to your deposit addresses
+- The system prioritizes user control over automatic matching
+
+**For Understanding Rewards**:
+- Your boost only applies to the address you point it to
+- You can only boost one address at a time
+- Pointing incorrectly means your boost won't work
+
+**For Planning**:
+- Choose one primary address for deposits if possible
+- Understand that cross-chain coordination requires extra steps
+- The system is designed to be transparent and user-controlled
+
+<Note>
+Address linking ensures you can maximize your rewards even when participating across multiple networks, while maintaining transparency and user control over the boost system.
+</Note>

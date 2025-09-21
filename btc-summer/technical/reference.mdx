@@ -1,0 +1,140 @@
+---
+title: "Technical Reference"
+description: "Contract addresses, token denominations, and technical specifications for BTC Summer campaign"
+icon: "book"
+---
+
+Complete technical reference for BTC Summer campaign implementation, including smart contract addresses, token denominations, and integration specifications.
+
+## Smart Contract Addresses
+
+### Points & Rewards Contracts
+
+```jsx
+Points Contract:        neutron1yu55umrtnna36vyjvhexp6q2ktljunukzxp9vptsfnylequg7gvqrcqf42
+Boost Pointer Contract: neutron1wn3y2gefk2whkmsu49ql75jytdgvdtn2q583t25j5fvcn47fh9cqv4834k
+Vesting Contract:       neutron1dz57hjkdytdshl2uyde0nqvkwdww0ckx7qfe05raz4df6m3khfyqfnj0nr
+NTRN Lock Contract:     neutron14lnmj4k0tqsfn3x8kmnmacg64ct2utyz0aaxtm5g3uwwp8kk4f6shcgrtt
+```
+
+---
+
+## Token Denominations
+
+### Bitcoin LST Denominations
+
+```jsx
+FBTC:     ibc/2EB30350120BBAFC168F55D0E65551A27A724175E8FBCC7B37F9A71618FE136B
+LBTC:     ibc/B7BF60BB54433071B49D586F54BD4DED5E20BEFBBA91958E87488A761115106B
+solvBTC:  ibc/C0F284F165E6152F6DDDA900537C1BC8DA1EA00F03B9C9EC1841FA7E004EF7A3
+eBTC:     ibc/E2A000FD3EDD91C9429B473995CE2C7C555BCC8CFC1D0A3D02F514392B7A80E8
+pumpBTC:  ibc/1075520501498E008B02FD414CD8079C0A2BAF9657278F8FB8F7D37A857ED668
+uniBTC:   ibc/3F1D988D9EEA19EB0F3950B4C19664218031D8BCE68CE7DE30F187D5ACEA0463
+```
+
+### Base Assets
+
+```jsx
+WBTCd.atom: ibc/0E293A7622DC9A6439DB60E6D234B5AF446962E27CA3AB44D0590603DFF6968E
+eth.atom:   ibc/694A6B26A43A2FBECCFFEAC022DEACB39578E54207FDD32005CD976B57B98004
+eth.axl:    ibc/A585C2D15DCD3B010849B453A2CFCB5E213208A5AB665691792684C26274304D
+```
+
+---
+
+## Supervault Addresses
+
+### Vaults paired with wBTC.atom
+
+```jsx
+fbtc:    neutron1ct00dzd944axt0pw9ak25a3ar40n8tmdwwnqxv6dpxxy6v3ysz9sw7n3jd
+lbtc:    neutron1720ank30032ml4h6rsygv0j9q4kdg9yr5g57yn55rmw3mnstg24q2keq2y
+ebtc:    neutron1s8k6gcrnsfrs9rj3j8757w4e0ttmzsdmjvwfwxruhu2t8xjgwxaqegzjgt
+pumpbtc: neutron16x9rk787mdaatmd58cevex6sc3p55uhshjmzyf3aa9atx0dgauvs8u8tj0
+solvbtc: neutron1vve4kr2j8ftydrh3gjqpns4p86l8x5unpvvheqdwlhpvawarea2suu8972
+unibtc:  neutron1704tmu9nvgk0l8xmpua0su6dq3r89mht0adlx8gxte695qapstks6lzmma
+```
+
+---
+
+## Oracle Addresses
+
+### Price Feed Contracts
+
+```jsx
+FBTC:    neutron14edzq3zw8unmtjke0jaay6hcmyjdgku6s60uu02e79pdkfcte59syemhm0
+LBTC:    neutron1w29vh2hjnjef9e2dujc5j4ear4g5th955vetjrx42m7eedeg8ydq3v9zee
+solvbtc: neutron1fec8mrq5kx0waxd7ga9pu7y72su7tj9ux75x4u9gqr7jnm33v2dq8p68ln
+pumpbtc: neutron1grunp28407u85dtmxpxv7hl5tsvr65xemzgcquc05vmwj7w32jsseey5ta
+unibtc:  neutron137a45rpg358gyyvl9e0fqrsqr6w34djcnmp9vn9zczls7wlcnpkqjmcuh8
+ebtc:    neutron15kejswf0xwghy6jj89y0wvdkxuztdrhpacx29l448zlfkl206u5q2vjwt2
+```
+
+---
+
+## Network Configuration
+
+### Neutron Mainnet
+
+```jsx
+Chain ID: neutron-1
+RPC: https://rpc-vertexa.neutron-1.neutron.org
+REST: https://rest-solara.neutron-1.neutron.org
+```
+
+<Info>
+For comprehensive network information including additional RPC endpoints, testnet details, and node configurations, see [Network Endpoints](/resources/endpoints).
+</Info>
+
+### Supported Bridges
+
+```jsx
+Ethereum → Neutron: Eureka Bridge
+Noble → Neutron: IBC
+Osmosis → Neutron: IBC
+Cosmos Hub → Neutron: IBC
+```
+
+---
+
+## Integration Approach
+
+### Smart Contract Queries
+
+Use standard Cosmos SDK tools for smart contract interaction:
+
+```javascript
+// Example using CosmJS
+import { CosmWasmClient } from '@cosmjs/cosmwasm-stargate';
+
+// Connect to Neutron
+const client = await CosmWasmClient.connect('https://rpc-neutron.keplr.app');
+
+// Query user points (when contract is deployed)
+const userPoints = await client.queryContractSmart(
+  pointsContractAddress, // Contract address will be provided upon deployment
+  { get_user_balance: { address: userAddress } }
+);
+```
+
+---
+
+## Additional Resources
+
+<CardGroup cols={3}>
+  <Card title="Address Linking" icon="link" href="/btc-summer/technical/address-linking">
+    Cross-chain coordination implementation details
+  </Card>
+  
+  <Card title="Neutron Developer Docs" icon="code" href="/developers/overview">
+    Complete Neutron development resources
+  </Card>
+  
+  <Card title="Network Endpoints" icon="network-wired" href="/resources/endpoints">
+    RPC, REST, and GRPC endpoints for Neutron networks and node information
+  </Card>
+</CardGroup>
+
+<Note>
+This reference focuses on factual, implemented components. API specifications will be added as development progresses.
+</Note>

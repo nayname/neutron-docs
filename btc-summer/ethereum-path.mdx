@@ -1,0 +1,179 @@
+---
+title: "Ethereum Path"
+description: "Complete guide for participating in BTC Summer using Ethereum wallets and automated vault strategies"
+icon: "ethereum"
+---
+
+**Best for**: Users coming from Ethereum who want to participate with familiar wallets like MetaMask while accessing Bitcoin DeFi opportunities through automated vault strategies.
+
+<Note>
+This guide covers the evergreen process for Ethereum participation in BTC Summer. For current Phase 1 specific vault listings and reward budgets, see [Phase 1 Details](/btc-summer/ethereum-path/phase-1).
+</Note>
+
+## How It Works
+
+When you deposit through BTC Summer vaults, your assets are automatically:
+
+1. **Bridged** to Neutron via secure cross-chain infrastructure
+2. **Deployed** to eligible DeFi protocols ([Amber](https://app.amberfi.io/) lending ([docs](https://docs.amberfi.io/)), [Supervaults](https://app.neutron.org/earn/supervaults) LP)
+3. **Earning** rewards from both DeFi yields and NTRN campaign incentives
+
+<Info>
+All vault withdrawals and campaign rewards are processed on Neutron - you'll need a Neutron wallet to receive both your NTRN campaign rewards and withdrawn assets (Supervault LP tokens, lending assets) regardless of vault strategy. For Neutron wallet setup, see our [User Quickstart Guide](/quickstart#for-users). For detailed cross-chain coordination, see [Address Linking System](/btc-summer/technical/address-linking).
+</Info>
+
+
+**Current vault offerings change by phase**. For specific vault listings, caps, and availability:
+
+<Card title="Phase 1 Vault Listings" icon="table" href="/btc-summer/ethereum-path/phase-1">
+  Complete vault tables with caps, KYC requirements, and allocation details for Phase 1
+</Card>
+
+## Step-by-Step Process
+
+<AccordionGroup>
+  <Accordion title="1. Prepare Your Wallet">
+    **Compatible Wallets**:
+    - MetaMask (recommended)
+    - Any EVM compatible wallet
+
+    **Required Assets**: 
+    - Accepted deposit assets in Phase 1: wBTC, eBTC, solvBTC, and uniBTC ([more information on Phase 1 eligible assets](/btc-summer/ethereum-path/phase-1#eligible-assets))
+    - ETH for gas fees
+    - USDC (for USDC-maxBTC vault only)
+  </Accordion>
+
+  <Accordion title="2. Navigate to Bitcoin Summer">
+    Visit [app.neutron.org/bitcoin-summer](https://app.neutron.org/bitcoin-summer) to access the vault interface.
+  </Accordion>
+
+  <Accordion title="3. Complete Deposit">
+    <Steps>
+      <Step title="Select Vault">
+        Choose the **Ethereum Vaults** tab (for Ethereum deposits) vs. the **Neutron Positions** tab. Pick a vault from the list - hovering over a vault will show the eligible deposit asset (e.g., WBTC, eBTC, uniBTC).
+      </Step>
+      <Step title="Connect Ethereum Wallet">
+        Once you've selected a vault, connect your preferred Ethereum wallet to begin the deposit process
+      </Step>
+      <Step title="Enter Deposit Amount">
+        Enter the amount to deposit or use "Max" to allocate your full balance. You can also click on the dollar value to deposit by dollar-denominated amounts
+      </Step>
+      <Step title="Confirm Transaction">
+        Once you've entered an amount, confirm the transaction in your wallet extension
+      </Step>
+      <Step title="Monitor Position">
+        Upon successfully depositing, you can view your position and any accrued rewards on [the Balance page](app.neutron.org/balance), the Bitcoin Summer Ethereum Vaults table, or on the individual vault page for the vault you deposited into
+      </Step>
+    </Steps>
+  </Accordion>
+
+  <Accordion title="4. Monitor Rewards">
+    - **Campaign Rewards**: NTRN incentives based on your deposit size and duration. Different activities earn 1x-6x multipliers - see [NTRN Rewards Multipliers](/btc-summer/rewards#ntrn-rewards-multipliers)
+    - **DeFi Yields**: Underlying protocol rewards (lending rates, LP fees)
+    - **Asset Issuer Rewards**: Potential additional rewards from LST issuers
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## How to Withdraw
+
+<Info>
+**Important**: Withdrawals are processed on the Neutron side. You'll receive the underlying positions directly to your wallet, not back through the vault interface.
+</Info>
+
+<Steps>
+  <Step title="Navigate to Your Vault">
+    To withdraw your balance from the vaults, simply navigate to a vault in which you have previously made a deposit
+  </Step>
+  <Step title="Switch to Withdrawal Mode">
+    Toggle the setting in the top right from **Deposit** to **Withdrawal** and enter the amount you'd like to withdraw from your position
+  </Step>
+  <Step title="Confirm Withdrawal">
+    Withdrawals from the vaults must be confirmed using your Ethereum wallet
+  </Step>
+</Steps>
+
+<Warning>
+**Phase Timing**: Bitcoin Summer Phases last two months, and you can view the amount of time remaining in a Phase on the Bitcoin Summer dashboard. **Withdrawing your balance from a vault before the end of a Phase will cause you to forfeit your NTRN rewards**.
+</Warning>
+
+**Need to set up a Neutron wallet?** See our [User Quickstart Guide](/quickstart#for-users) for step-by-step wallet setup instructions.
+
+
+### What You Receive
+
+<AccordionGroup>
+  <Accordion title="Simple Lending Vaults (Just Lend)">
+    - **Underlying assets** (wBTC, eBTC, etc.) sent to your Neutron wallet
+    - **Campaign rewards** (NTRN tokens) sent to your Neutron wallet
+  </Accordion>
+
+  <Accordion title="LP Strategy Vaults (Hybrid, LST Main, maxBTC)">
+    - **Supervault LP tokens** (Neutron-native tokens)
+    - **Lending assets** (underlying BTC derivatives)
+    - **Campaign rewards** (NTRN tokens)
+    - **All sent to your Neutron wallet**
+  </Accordion>
+</AccordionGroup>
+
+Your positions can be tracked on the [Balance page of the Neutron App](https://app.neutron.org/balance)
+
+---
+
+## Maximize Your Rewards
+
+<Note>
+**Want to boost your rewards up to 3x?** You'll need to set up a Neutron wallet and lock NTRN tokens, then point the boost to your EVM deposit address.
+</Note>
+
+### Boost Your NTRN Rewards (For Ethereum Users)
+
+You can boost your NTRN rewards during Bitcoin Summer by up to 3x by staking NTRN for up to 48 months. During your selected staking period, you'll earn ~3% NTRN staking rewards + up to 3x boosted Bitcoin Summer NTRN rewards.
+
+<Steps>
+  <Step title="Access Booster Feature">
+    To boost your rewards, click the **"Unlock your booster"** button on the Bitcoin Summer Ethereum Vaults page
+  </Step>
+  <Step title="Connect Neutron Wallet">
+    You will be prompted to connect a Neutron wallet. This is the wallet that will accumulate NTRN rewards. We recommend creating one using Keplr for this step if you don't already have a Neutron wallet
+  </Step>
+  <Step title="Link Your Wallets">
+    You'll be prompted to link your Neutron wallet with the EVM address that you used to deposit assets into the Bitcoin Summer vaults. **Note**: You must use the EVM address from which you deposited assets into the Bitcoin Summer vault
+  </Step>
+  <Step title="Stake & Lock NTRN">
+    After linking your wallets, you can monitor your boosts by clicking **"View boost overview"** from the Bitcoin Summer dashboard. You can increase your multiplier by selecting the **"Stake & Lock"** option from the modal. **Note**: Make sure the Neutron chain is selected on your Neutron wallet
+  </Step>
+  <Step title="Optimize Your Multiplier">
+    You can stake any amount of NTRN for up to 48 months to boost your rewards. Larger deposits and longer stake durations will maximize the size of your multiplier, up to 3x. **Note**: It can take up to 15 minutes after submitting your transaction for the multiplier to appear on the Bitcoin Summer dashboard
+  </Step>
+</Steps>
+
+<Info>
+For complete boost strategies, NTRN locking mechanics, and detailed guidance, see [Rewards Guide](/btc-summer/rewards). For technical implementation details, see [Address Linking System](/btc-summer/technical/address-linking).
+</Info>
+
+---
+
+## Need Help?
+
+<CardGroup cols={2}>
+  <Card title="FAQ" icon="circle-question" href="/btc-summer/faq">
+    Common questions about Ethereum participation and troubleshooting
+  </Card>
+  
+  <Card title="Neutron Path" icon={<svg width="16" height="16" viewBox="0 0 357.21 376.34" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M41.34.71c-4.54-2.63-9.53,2.59-6.72,6.99l84.33,132.81c2.45,3.81-1.63,8.44-5.76,6.54L5.3,96.94c-3.68-1.68-7.04,2.86-4.31,5.85l69.22,82.2c1.54,1.86,1.54,4.54,0,6.35L.99,273.55c-2.68,3,.64,7.53,4.31,5.85l107.94-50.11c4.13-1.91,8.17,2.72,5.76,6.54l-84.33,132.81c-2.81,4.4,2.22,9.62,6.72,6.99l312.42-181.56c4.54-2.63,4.54-9.21,0-11.8L41.34.71Z" fill="currentColor"/></svg>} href="/btc-summer/neutron-path">
+    Compare with direct Neutron participation for advanced users
+  </Card>
+</CardGroup>
+
+<CardGroup cols={2}>
+  <Card title="Rewards Guide" icon="chart-line" href="/btc-summer/rewards">
+    Learn about NTRN locking and reward optimization strategies
+  </Card>
+  
+  <Card title="Campaign Details" icon="info" href="/btc-summer/campaign-details">
+    Complete campaign mechanics and participation requirements
+  </Card>
+</CardGroup>
+
