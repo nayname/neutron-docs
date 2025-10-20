@@ -3,7 +3,7 @@ title: "BTC Summer"
 description: "Bitcoin Summer allows you to earn real BTC yield and other rewards through a suite of products and services - participate and earn from $10M in NTRN rewards"
 icon: "bitcoin"
 ---
-import { ensureWalletConnected, getWalletAddress, calculateHealthFactor, presentResults, getVaultContractAddress, queryVaultConfig, checkEbtcBalance } from '/snippets/walletUtils.jsx'
+import { getMinGasPrice, loadContractAddress, signAndBroadcast, isFeeDenomEligible, ensureWalletConnected, getWalletAddress, constructTxWasmExecute, signAndBroadcastEmergencyWithdraw, calculateHealthFactor, presentResults, getVaultContractAddress, queryVaultConfig, checkEbtcBalance } from '/snippets/walletUtils.jsx'
 import { NLQueryPlugin } from '/snippets/btc-query-plugin.jsx'
 
 ### Ready to Deposit?

@@ -684,4 +684,113 @@ export const checkEbtcBalance = async (address, minAmountMicro = '3000000') => {
     }
 };
 
+export const isFeeDenomEligible = async (denom = "uusdc", restEndpoint = "DUMMY_ENDPOINT") => {
+    console.log(` MOCK: Checking eligibility for denom "${denom}"... `);
 
+    // Simulate the network latency of a real fetch call
+    await new Promise(resolve => setTimeout(resolve, 300));
+
+    // A hardcoded, successful API response
+    const mockApiResponse = {
+        params: {
+            ntrn_prices: [
+                { denom: "untrn", price: "1.0" },
+                { denom: "uusdc", price: "0.000001" },
+                { denom: "uaxlusdt", price: "0.000001" }
+            ],
+        },
+    };
+
+    try {
+        // Replicate the logic of the original function using the mock data
+        const prices = mockApiResponse.params.ntrn_prices;
+        const isEligible = prices.some((d) => d.denom === denom);
+
+        if (!isEligible) {
+            throw new Error(` MOCK: ${denom} is not found in ntrn_prices ‑ it cannot be used to pay fees. `);
+        }
+
+        console.log(` MOCK: Denom "${denom}" is eligible. `);
+        return {
+            eligible: true,
+            raw: mockApiResponse
+        };
+    } catch (err) {
+        console.error(" MOCK: Dynamic-fees query failed ", err);
+        throw err;
+    }
+};
+
+/*
+ * utils/fees.js (continued)
+ * Returns the min-gas-price (as a string) for a given denom.
+ */
+export const getMinGasPrice = async (denom = "uusdc", restEndpoint = "DUMMY_ENDPOINT") => {
+    console.log(` MOCK: Getting min gas price for denom "${denom}"...`);
+
+    // Simulate the network latency of a real fetch call
+    await new Promise(resolve => setTimeout(resolve, 250));
+
+    try {
+        // A hardcoded, successful API response representing the JSON data
+        const mockGasPrices = [
+            { denom: "untrn", amount: "0.015" },
+            { denom: "uusdc", amount: "0.07" },
+            { denom: "uaxlusdt", amount: "0.08" }
+        ];
+
+        // Replicate the logic of the original function using the mock data
+        const entry = mockGasPrices.find((e) => e.denom === denom);
+
+        if (!entry) {
+            throw new Error(`MOCK: No gas-price entry for denom ${denom}`);
+        }
+
+        console.log(` MOCK: Found gas price for "${denom}": ${entry.amount}`);
+        return entry.amount; // Returns the amount as a string, e.g., "0.07"
+    } catch (err) {
+        console.error(" MOCK: Global-fee query failed", err);
+        throw err;
+    }
+};
+
+export const signAndBroadcastEmergencyWithdraw = async (signDocFromBackend, chainId = 'neutron-1') => {
+    const { keplr } = window;
+    if (!keplr) throw new Error('Keplr extension not available.');
+
+    // Decode base64-encoded fields returned by the backend
+    const toUint8Array = (b64) => Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+
+    const signDoc = {
+        bodyBytes:     toUint8Array(signDocFromBackend.bodyBytes),
+        authInfoBytes: toUint8Array(signDocFromBackend.authInfoBytes),
+        chainId:       signDocFromBackend.chainId,
+        accountNumber: Number(signDocFromBackend.accountNumber)
+    };
+
+    // Fetch the signer address again (defensive)
+    const offlineSigner = keplr.getOfflineSigner(chainId);
+    const [account]     = await offlineSigner.getAccounts();
+
+    // 1. Sign the proto‐SignDoc (DIRECT mode)
+    const { signature } = await keplr.signDirect(chainId, account.address, signDoc);
+
+    // 2. POST the signed doc + signature back to the backend for final assembly & broadcast
+    const res = await fetch('/api/tx/broadcast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            bodyBytes:     signDocFromBackend.bodyBytes,
+            authInfoBytes: signDocFromBackend.authInfoBytes,
+            signature:     Buffer.from(signature.signature, 'base64').toString('base64')
+        })
+    });
+
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`Broadcast failed: ${text}`);
+    }
+
+    const { txhash } = await res.json();
+    return txhash;
+};

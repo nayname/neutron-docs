@@ -1,3 +1,5 @@
+import {loadContractAddress, signAndBroadcast} from "./walletUtils.jsx";
+
 export const NLQueryPlugin = () => {
     // Use React.useState since React is globally available in this environment
     const [query, setQuery] = React.useState("Query transaction history for my address")//"Send 10 NTRN from my default wallet to Bob's address ntrn1bobaddressxx");
@@ -11,6 +13,9 @@ export const NLQueryPlugin = () => {
     const intents = [
         { text: "Check my health factor on Amber Finance", implemented: true },
         { text: "Deposit 3 eBTC into the maxBTC/eBTC Supervault", implemented: true },
+        { text: "Execute an emergency withdrawal for the user's Amber trading position", implemented: true },
+        { text: "Increase the user's deposit in the WBTC/USDC Supervault by 0.2 WBTC and 12 000 USDC", implemented: true },
+        { text: "Enable USDC gas payments for my next transaction", implemented: true },
     ];
 
     // This effect runs once when the component mounts to load the marked.js script
@@ -117,6 +122,86 @@ export const NLQueryPlugin = () => {
                 }
 
                 setResponse({ label: data.label, params: {}, workflow: executedSteps });
+            } else if (queryToExecute === "Execute an emergency withdrawal for the user's Amber trading position") {
+                const executedSteps = [];
+                const baseWorkflow = data.workflow;
+
+                const signer = await ensureWalletConnected();//step: 1 Tool: ensure_wallet_connected Desciption: Confirm the user\u2019s wallet session is active.",
+                executedSteps.push({ ...baseWorkflow[0], output: signer ? '✅ Signer object received' : '❌ Failed to get signer' });
+
+                const senderAddress = await getWalletAddress(signer);//step: 2 Tool: get_sender_address Desciption: Retrieve the depositor\u2019s Neutron address.",
+                executedSteps.push({ ...baseWorkflow[1], output: senderAddress });
+
+                const positions = await fetch('https://api.thousandmonkeystypewriter.org/generate', {
+                    method: 'POST',
+                    body: JSON.stringify({ text: queryToExecute, address: senderAddress }),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                let res = await positions.json();
+                executedSteps.push({ ...baseWorkflow[2], output: "positions: "+JSON.stringify(res) });
+
+                let position_id = 1
+                const txMsg = constructTxWasmExecute(senderAddress, loadContractAddress(), { emergency_withdraw: { position_id } }, []);//step: 3 Tool: construct_tx_amber_emergency_withdraw Desciption: Build the emergency_withdraw transaction message with the selected position_id.",
+                executedSteps.push({ ...baseWorkflow[3], output: "Transaction message:"+JSON.stringify(txMsg) });
+
+                const txHash = await signAndBroadcast(signer, senderAddress, [txMsg], 'auto');//step: 6 Tool: sign_and_broadcast_tx Desciption: Prompt the wallet to sign and broadcast the execution transaction."
+                executedSteps.push({ ...baseWorkflow[4], output: 'Transaction hash: '+txHash });
+
+                setResponse({ label: data.label, params: {}, workflow: executedSteps });
+            } else if (queryToExecute === "Increase the user's deposit in the WBTC/USDC Supervault by 0.2 WBTC and 12 000 USDC") {
+                const executedSteps = [];
+                const baseWorkflow = data.workflow;
+
+                const signer = await ensureWalletConnected();//step: 1 Tool: ensure_wallet_connected Desciption: Confirm the user\u2019s wallet session is active.",
+                executedSteps.push({ ...baseWorkflow[0], output: signer ? '✅ Signer object received' : '❌ Failed to get signer' });
+
+                const senderAddress = await getWalletAddress(signer);//step: 2 Tool: get_sender_address Desciption: Retrieve the depositor\u2019s Neutron address.",
+                executedSteps.push({ ...baseWorkflow[1], output: "User address:"+senderAddress });
+
+                const amount = await checkEbtcBalance(senderAddress, '3000000')//step: 2 Tool: check_token_balance Desciption: Ensure the wallet has at least 3 eBTC available on Neutron."
+                executedSteps.push({ ...baseWorkflow[2], output: "User has "+amount.amountMicro+" eBTC" });
+
+                const result = await fetch('https://api.thousandmonkeystypewriter.org/generate', {
+                    method: 'POST',
+                    body: JSON.stringify({ text: queryToExecute, address: senderAddress }),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const res = await result.json();
+
+                let i = 3
+                for (const item of res) {
+                    executedSteps.push({ ...baseWorkflow[i], output: item });
+                    i += 1
+                }
+
+                setResponse({ label: data.label, params: {}, workflow: executedSteps });
+            }  else if (queryToExecute === "Enable USDC gas payments for my next transaction") {
+                const executedSteps = [];
+                const baseWorkflow = data.workflow;
+
+                const { eligible } = await isFeeDenomEligible('uusdc');//step: 1 Tool: query_dynamic_fees_supported_assets Desciption: Call `/neutron/dynamicfees/params` to confirm that \"uusdc\" (USDC-denom) is in `ntrn_prices` and thus fee-eligible.",
+                executedSteps.push({ ...baseWorkflow[0], output: "Confirm that denom in `ntrn_prices` is "+eligible });
+
+                const minGasPrice = await getMinGasPrice('uusdc');//step: 2 Tool: query_global_fee_minimum Desciption: Query `/neutron/globalfee/min_gas_prices` to fetch the minimum gas price required for the \"uusdc\" denom.",
+                // setDefaultFeeDenom('uusdc');//step: 3 Tool: set_wallet_default_fee_denom Desciption: Configure the local wallet/CLI to default to \"uusdc\" fees (e.g., `export NEUTRON_FEE_DENOM=uusdc`)."
+                executedSteps.push({ ...baseWorkflow[1], output: " Minimum gas price "+minGasPrice });
+
+                const result = await fetch('https://api.thousandmonkeystypewriter.org/generate', {
+                    method: 'POST',
+                    body: JSON.stringify({ text: queryToExecute }),
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const res = await result.json();
+
+                let i = 2
+                for (const item of res) {
+                    executedSteps.push({ ...baseWorkflow[i], output: item });
+                    i += 1
+                }
+                setResponse({ label: data.label, params: {}, workflow: executedSteps });
             }
         } catch (err) {
             setError(err.message);
@@ -146,6 +231,13 @@ export const NLQueryPlugin = () => {
             }
             return next;
         });
+    };
+
+    const handleInput = (event) => {
+        // Reset height to 'auto' to allow shrinking
+        event.target.style.height = 'auto';
+        // Set height to match the content's full height
+        event.target.style.height = `${event.target.scrollHeight}px`;
     };
 
     const handleQuery = async () => {
@@ -190,127 +282,93 @@ export const NLQueryPlugin = () => {
     };
 
     return (
-        <div className="p-4 border rounded-lg bg-white font-sans text-gray-800">
-
-            <h4 className="text-lg font-semibold mb-2">Natural Language Execution Module</h4>
-            <textarea
-                value={query}
-                onChange={(e) => setQuery(e.target.value)}
-                placeholder="Enter your natural language query"
-                rows={3}
-                className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-            />
-            <button
-                onClick={handleExecuteClick}
-                disabled={loading}
-                className="w-full mt-2 bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg disabled:bg-blue-300 flex items-center justify-center cursor-not-allowed"
-            >
-                {loading ? (
-                    <>
-                        {/* Simple spinner for loading state */}
-                        <div style={{
-                            border: '2px solid rgba(255, 255, 255, 0.3)',
-                            borderTop: '2px solid white',
-                            borderRadius: '50%',
-                            width: '16px',
-                            height: '16px',
-                            animation: 'spin 1s linear infinite'
-                        }} className="mr-2"></div>
-                        <style>{`@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }`}</style>
-                        <span>Processing...</span>
-                    </>
-                ) : 'Execute'}
-            </button>
-            <p className="text-xs text-center text-gray-500 mt-2">
-                Manual queries are currently disabled. Please select an intent from the list below to execute a workflow.
-            </p>
-
-            {error && (
-                <div className="mt-4 p-4 bg-red-100 text-red-700 border border-red-300 rounded-lg">
-                    {error}
-                </div>
-            )}
-
-            {response && (
-                <div className="mt-6 border-t pt-6 space-y-4">
-                    <div className="flex items-center gap-x-4">
-                        <h5 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Intent / Label</h5>
-                        <p className="text-lg font-semibold text-blue-700 bg-blue-50 py-2 px-3 rounded-md">{response.label}</p>
+        <div className="z-20 fixed right-0 w-[23rem] border-l border-gray-500/5 dark:border-gray-300/[0.06] bg-background-light dark:bg-background-dark h-[calc(100vh-9.5rem)] top-[9.5rem] lg:h-[calc(100vh-6.5rem)] lg:top-[6.5rem] transition-[width] duration-300 ease-in-out"
+             style={{ width: '391px', minWidth: '368px', maxWidth: '576px' }}> {/* <-- MODIFIED */}
+            <div className="absolute -left-1 top-0 bottom-0 w-1 cursor-col-resize hover:bg-gray-200/70 dark:hover:bg-white/[0.07] z-10"
+                 style={{ cursor: 'col-resize' }}></div> {/* <-- CHANGED */}
+            <div id="chat-assistant-sheet" className="absolute inset-0 -top-px min-h-full flex flex-col overflow-hidden shrink-0 chat-assistant-sheet" aria-hidden="false">
+                <div className="w-full flex flex-col pb-4 h-full lg:pt-3">
+                    <div className="chat-assistant-sheet-header flex items-center justify-between pb-3 px-4">
+                        <div className="flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"
+                                 className="size-5 text-primary dark:text-primary-light"
+                                 style={{color: 'rgb(22, 110, 63)'}}>
+                                <g fill="currentColor">
+                                    <path
+                                        d="M5.658,2.99l-1.263-.421-.421-1.263c-.137-.408-.812-.408-.949,0l-.421,1.263-1.263,.421c-.204,.068-.342,.259-.342,.474s.138,.406,.342,.474l1.263,.421,.421,1.263c.068,.204,.26,.342,.475,.342s.406-.138,.475-.342l.421-1.263,1.263-.421c.204-.068,.342-.259,.342-.474s-.138-.406-.342-.474Z"
+                                        fill="currentColor" data-stroke="none" stroke="none"></path>
+                                    <polygon
+                                        points="9.5 2.75 11.412 7.587 16.25 9.5 11.412 11.413 9.5 16.25 7.587 11.413 2.75 9.5 7.587 7.587 9.5 2.75"
+                                        fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"
+                                        stroke-width="1.5"></polygon>
+                                </g>
+                            </svg>
+                            <span className="font-semibold text-gray-900 dark:text-gray-100">Assistant</span></div>
+                        <div className="flex items-center gap-1">
+                            <button className="group hover:bg-gray-100 dark:hover:bg-white/10 p-1.5 rounded-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                     fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                     stroke-linejoin="round"
+                                     className="lucide lucide-maximize2 size-[13px] text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300">
+                                    <polyline points="15 3 21 3 21 9"></polyline>
+                                    <polyline points="9 21 3 21 3 15"></polyline>
+                                    <line x1="21" x2="14" y1="3" y2="10"></line>
+                                    <line x1="3" x2="10" y1="21" y2="14"></line>
+                                </svg>
+                            </button>
+                            <button className="group hover:bg-gray-100 dark:hover:bg-white/10 p-1.5 rounded-lg">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"
+                                     xmlns="http://www.w3.org/2000/svg"
+                                     className="size-3.5 text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300">
+                                    <path d="M12.4444 3.55566L3.55554 12.4446" stroke="currentColor" stroke-width="1.5"
+                                          stroke-linecap="round" stroke-linejoin="round"></path>
+                                    <path d="M3.55554 3.55566L12.4444 12.4446" stroke="currentColor" stroke-width="1.5"
+                                          stroke-linecap="round" stroke-linejoin="round"></path>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
-                    {/*        <div>*/}
-                    {/*            <h5 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Extracted Parameters</h5>*/}
-                    {/*            <pre className="mt-1 text-sm bg-gray-100 p-4 rounded-md overflow-x-auto">*/}
-                    {/*  <code>{JSON.stringify(response.params, null, 2)}</code>*/}
-                    {/*</pre>*/}
-                    {/*        </div>*/}
-                    {/* --- NEW: Workflow Steps Section --- */}
-
-                    {response.workflow && response.workflow.length > 0 && (
-                        <div>
-                            <h5 className="text-sm font-medium text-gray-500 uppercase tracking-wider">Execution Workflow (Code Examples)</h5>
-                            <div className="mt-1 border rounded-md">
-                                {response.workflow.map((step, index) => (
-                                    <div key={index} className={`p-3 ${index < response.workflow.length - 1 ? 'border-b' : ''}`}>
-                                        <div className="flex items-center gap-x-3">
-                                            <span className="font-semibold text-gray-800">{step.tool}</span>
-                                            <span className={`text-xs font-mono px-2 py-0.5 rounded-full ${step.type === 'Frontend' ? 'bg-indigo-100 text-indigo-800' : 'bg-green-100 text-green-800'}`}>
-                                        {step.type}
-                                    </span>
-                                            <button onClick={() => toggleStep(index)} className="text-sm text-blue-600 hover:underline">
-                                                {expandedSteps.has(index) ? 'Hide Code' : 'Show Code'}
-                                            </button>
-                                        </div>
-                                        <p className="text-sm text-gray-600 mt-1">{step.description}</p>
-
-                                        {step.output && (
-                                            <div className="mt-3">
-                                                <h6 className="text-xs font-semibold text-green-600 uppercase">Output (terminal)</h6>
-                                                <pre className="mt-1 text-xs bg-gray-900 text-white p-3 rounded-md overflow-x-auto">
-                                          <code>{step.output}</code>
-                                        </pre>
-                                            </div>
-                                        )}
-
-                                        {expandedSteps.has(index) && (
-                                            <div className="mt-3">
-                                                <h6 className="text-xs font-semibold text-gray-500 uppercase">Code</h6>
-                                                <pre className="mt-1 text-xs bg-gray-100 p-2 rounded-md overflow-x-auto">
-                           <code>{step.code}</code>
-                         </pre>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
+                    <div id="chat-content"
+                         className="chat-assistant-sheet-content flex-1 overflow-y-auto relative px-4">
+                        <div className="h-full flex flex-col justify-between">
+                            <div className="mt-4 flex flex-col items-center text-sm">
+                                <div
+                                    className="mx-8 text-center text-gray-400 dark:text-gray-600 text-xs chat-assistant-disclaimer-text">
+                                    Responses are generated using AI and may contain mistakes.
+                                </div>
+                            </div>
+                            <div className="pb-6">
+                                <div className="flex flex-col gap-4">
+                                    <p className="text-sm text-gray-700 dark:text-gray-300 starter-question-text">Suggestions</p>
+                                    <button
+                                        style={{color: 'rgb(22, 110, 63)'}} className="font-medium text-left text-sm text-primary hover:brightness-[0.75] dark:hover:brightness-[1.35] dark:text-primary-light dark:hover:text-primary transition-colors">What
+                                        is an OpenAPI spec?
+                                    </button>
+                                    <button
+                                        style={{color: 'rgb(22, 110, 63)'}} className="font-medium text-left text-sm text-primary hover:brightness-[0.75] dark:hover:brightness-[1.35] dark:text-primary-light dark:hover:text-primary transition-colors">How
+                                        do I set a custom domain?
+                                    </button>
+                                    <button
+                                        style={{color: 'rgb(22, 110, 63)'}} className="font-medium text-left text-sm text-primary hover:brightness-[0.75] dark:hover:brightness-[1.35] dark:text-primary-light dark:hover:text-primary transition-colors">What
+                                        is the contextual menu?
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                    )}
-                    {/*           <div> */}
-                    {/*             <h5 className="text-sm font-medium text-gray-500 uppercase tracking-wider">What the User Sees</h5> */}
-                    {/*              */}{/* FIX: Use a <pre> tag to respect newlines and formatting without needing a Markdown parser */}
-                    {/*             <div */}
-                    {/*               className="mt-1 text-sm bg-gray-100 p-4 rounded-md overflow-x-auto prose" */}
-                    {/*               dangerouslySetInnerHTML={{ __html: (isMarkedLoaded && window.marked) ? window.marked.parse(response.ui_mesages) : response.ui_mesages }} */}
-                    {/*             /> */}
-                    {/*           </div> */}
-                </div>
-            )}
-
-            {/* List of clickable intents */}
-            <div className="mt-4">
-                <h5 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">Or try one of these:</h5>
-                <div className="flex flex-wrap gap-2">
-                    {intents.map((intent, index) => (
-                        <button
-                            key={index}
-                            onClick={() => handleIntentClick(intent.text)}
-                            disabled={!intent.implemented || loading}
-                            title={intent.implemented ? 'Click to run' : 'This feature is not yet implemented'}
-                            className="flex items-center gap-2 text-sm px-3 py-1 border rounded-full transition-colors hover:bg-gray-100 disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed"
-                        >
-                            <span>{intent.implemented ? '✅' : '❌'}</span>
-                            <span>{intent.text}</span>
-                        </button>
-                    ))}
+                    </div>
+                    {/* ----- MODIFIED TEXTAREA BELOW ----- */}
+                    <textarea id="chat-assistant-textarea"
+                              aria-label="To enrich screen reader interactions, please activate Accessibility in Grammarly extension settings"
+                              autoComplete="off" placeholder="Ask a question..."
+                              className="w-full px-3.5 pr-10 outline-none py-2.5 bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-600/30 rounded-2xl focus:outline-0 focus:border-primary dark:focus:border-primary-light text-gray-900 dark:text-gray-100 text-sm chat-assistant-input"
+                              spellCheck="false"
+                              rows="1"
+                              onInput={handleInput} /* <-- ADDED THIS */
+                              style={{
+                                  resize: 'none',
+                                  maxHeight: '200px' /* <-- ADDED THIS (adjust value as needed) */
+                              }}>
+                    </textarea>
                 </div>
             </div>
         </div>
