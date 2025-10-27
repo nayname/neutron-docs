@@ -10,6 +10,15 @@ export const NLQueryPlugin = () => {
     const [isMarkedLoaded, setIsMarkedLoaded] = React.useState(false);
     const [expandedSteps, setExpandedSteps] = React.useState(new Set());
     const [loadingDots, setLoadingDots] = React.useState(1);
+    const [executionLevel, setExecutionLevel] = React.useState('Mock');
+    const [showTrustBanner, setShowTrustBanner] = React.useState(true);
+
+    const levels = [
+        { label: 'Mock', color: 'bg-gray-200 text-gray-800', description: 'Local simulation, no chain writes.' },
+        { label: 'Read-only', color: 'bg-blue-100 text-blue-800', description: 'Safe blockchain queries only.' },
+        { label: 'Testnet', color: 'bg-yellow-100 text-yellow-800', description: 'Write ops in test environment.' },
+        { label: 'Mainnet', color: 'bg-green-100 text-green-800', description: 'Production execution with wallet approval.' },
+    ];
 
     // A list of example intents with their implementation status
     const intents = [
@@ -98,9 +107,10 @@ export const NLQueryPlugin = () => {
                 const baseWorkflow = data.workflow;
 
                 const signer = await ensureWalletConnected();//step: 1 Tool: ensure_wallet_connected Desciption: Confirm the user\u2019s wallet session is active.",
+                var date = new Date();
                 executedSteps.push({
                     ...baseWorkflow[0],
-                    output: signer ? '✅ Signer object received' : '❌ Failed to get signer'
+                    output: signer ? '['+date.toISOString()+'] '+'✅ Signer object received' : '['+date.toISOString()+'] '+'❌ Failed to get signer'
                 });
 
                 const senderAddress = await getWalletAddress(signer);//step: 2 Tool: get_sender_address Desciption: Retrieve the depositor\u2019s Neutron address.",
@@ -113,13 +123,16 @@ export const NLQueryPlugin = () => {
                 });
 
                 let res = await positions.json();
-                executedSteps.push({...baseWorkflow[2], output: "positions: " + JSON.stringify(res)});
+                var date = new Date();
+                executedSteps.push({...baseWorkflow[2], output: '['+date.toISOString()+'] '+"positions: " + JSON.stringify(res)});
 
                 const computed = calculateHealthFactor(res.positions);//step: 3 Tool: calculate_health_factor Desciption: Compute or read the health factor metric returned by Amber for each position.",
-                executedSteps.push({...baseWorkflow[3], output: "Data normalized"});
+                var date = new Date();
+                executedSteps.push({...baseWorkflow[3], output: '['+date.toISOString()+'] '+"Data normalized"});
 
                 const summary = presentResults(computed);//step: 4 Tool: present_results Desciption: Return a formatted summary: position ID → health factor, collateral, debt."
-                executedSteps.push({...baseWorkflow[4], output: "Final result:" + summary});
+                var date = new Date();
+                executedSteps.push({...baseWorkflow[4], output: '['+date.toISOString()+'] '+"Final result:" + summary});
 
                 setResponse({label: data.label, params: {}, workflow: executedSteps});
             } else if (queryToExecute === "Deposit 3 eBTC into the maxBTC/eBTC Supervault") {
@@ -334,7 +347,7 @@ export const NLQueryPlugin = () => {
     return (
         <div id="panel"
              className="z-20 fixed right-0 w-[23rem] border-l border-gray-500/5 dark:border-gray-300/[0.06] bg-background-light dark:bg-background-dark h-[calc(100vh-9.5rem)] top-[9.5rem] lg:h-[calc(100vh-6.5rem)] lg:top-[6.5rem] transition-[width] duration-300 ease-in-out"
-             style={{width: '391px', minWidth: '368px', maxWidth: '576px'}}> {/* <-- MODIFIED */}
+             style={{width: '469px', minWidth: '441px', maxWidth: '691px'}}> {/* <-- MODIFIED */}
             <div
                 className="absolute -left-1 top-0 bottom-0 w-1 cursor-col-resize hover:bg-gray-200/70 dark:hover:bg-white/[0.07] z-10"
                 style={{cursor: 'col-resize'}}></div>
@@ -386,10 +399,26 @@ export const NLQueryPlugin = () => {
                     </div>
                     <div id="chat-content"
                          className="chat-assistant-sheet-content flex-1 overflow-y-auto relative px-4">
+                         {showTrustBanner && (
+                              <div className="mx-4 mb-3 p-3 rounded-md border border-yellow-300 bg-yellow-50 dark:bg-yellow-900/30 dark:border-yellow-800">
+                                <p className="text-xs text-gray-800 dark:text-gray-100 leading-snug">
+                                  ⚠️ This page can execute <strong>read-only queries</strong>.
+                                  Write operations require explicit <strong>wallet approval</strong> and default to <strong>Testnet</strong> mode.
+                                </p>
+                                <div className="flex justify-end mt-2">
+                                  <button
+                                    onClick={() => setShowTrustBanner(false)}
+                                    className="text-xs font-medium text-blue-600 hover:underline"
+                                  >
+                                    Got it
+                                  </button>
+                                </div>
+                              </div>
+                            )}
                         {/* ----- MOVED TEXTAREA HERE ----- */}
                         <textarea id="chat-assistant-textarea"
                                   aria-label="To enrich screen reader interactions, please activate Accessibility in Grammarly extension settings"
-                                  autoComplete="off" placeholder="Ask a question..."
+                                  autoComplete="off" placeholder="Enter an action (e.g. deposit 3 eBTC)"
                                   value={query}
                                   onKeyDown={handleKeyDown}
                                   onChange={(e) => setQuery(e.target.value)}
@@ -414,7 +443,7 @@ export const NLQueryPlugin = () => {
                             <div className="mt-6"> {/* Removed the surrounding bordered div */}
                                 <span
                                     className="text-sm text-gray-700 dark:text-gray-300 starter-question-text" // Applied classes from "Suggestions" title
-                                    style={{ minWidth: '80px' }} // Kept to prevent layout shift
+                                    style={{minWidth: '80px'}} // Kept to prevent layout shift
                                 >
                                     {`Generating${".".repeat(loadingDots)}`}
                                 </span>
@@ -422,7 +451,7 @@ export const NLQueryPlugin = () => {
                         )}
 
                         {/* ----- MODIFIED SUGGESTIONS BLOCK (HIDDEN WHEN LOADING) ----- */}
-                        {!loading && (
+                        {!loading && !response && (
                             <div className="mt-6">
                                 <div className="pb-6">
                                     <div className="flex flex-col gap-4">
@@ -442,48 +471,105 @@ export const NLQueryPlugin = () => {
                             </div>
                         )}
                         {response && (
-                            <div id="workflow" className="mt-6 border-t pt-6 space-y-4">
+                            <div id="workflow" className="mt-6 pt-6 space-y-4">
                                 {response.workflow && response.workflow.length > 0 && (
                                     <div
                                         className="border rounded-md bg-white dark:bg-white/[0.03] border-gray-200 dark:border-white/10">
-                                        <h5 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider p-3 border-b border-gray-200 dark:border-white/10">Execution
-                                            Workflow (Code Examples)</h5>
+                                        <h5 className="text-sm font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider p-3 border-b border-gray-200 dark:border-white/10">
+                                            Trust-aware execution steps&nbsp;
+                                            <span className="text-gray-400 dark:text-gray-500 normal-case font-normal">
+                                                — here are the proposed steps to execute a task. Initially, all steps run in
+                                                <strong className="text-green-700 dark:text-green-400"> Mock </strong>
+                                                mode only to demonstrate the execution flow; write actions require explicit
+                                                wallet approval and default to
+                                                <strong className="text-blue-700 dark:text-blue-400"> Testnet</strong>.
+                                            </span>
+                                            <a
+                                                href="https://your-security-page-url"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="ml-2 text-xs text-blue-600 hover:underline"
+                                            >
+                                                Security & Data Handling →
+                                            </a>
+                                        </h5>
                                         <div>
+                                            <div className="flex items-center justify-between p-3 border-b border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/[0.02]">
+                                                <div className="flex items-center gap-2">
+                                                    <h5 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                                        Execution Level:
+                                                    </h5>
+                                                    <span
+                                                        className={`text-xs font-semibold px-2 py-1 rounded-full ${
+                                                            levels.find(l => l.label === executionLevel)?.color
+                                                        }`}
+                                                    >
+      {executionLevel}
+    </span>
+                                                </div>
+
+                                                <select
+                                                    value={executionLevel}
+                                                    onChange={(e) => setExecutionLevel(e.target.value)}
+                                                    className="text-xs border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-2 py-1 focus:outline-none"
+                                                >
+                                                    {levels.map((level) => (
+                                                        <option key={level.label} value={level.label}>
+                                                            {level.label}
+                                                        </option>
+                                                    ))}
+                                                </select>
+                                            </div>
                                             {response.workflow.map((step, index) => (
                                                 <div key={index}
                                                      className={`p-3 ${index < response.workflow.length - 1 ? 'border-b border-gray-200 dark:border-white/10' : ''}`}>
                                                     <div className="flex items-center gap-x-3">
-                                                        <span
-                                                            className="font-semibold text-gray-800 dark:text-gray-200">{step.tool}</span>
-                                                        <span
-                                                            className={`text-xs font-mono px-2 py-0.5 rounded-full ${step.type === 'Frontend' ? 'bg-indigo-100 text-indigo-800' : 'bg-green-100 text-green-800'}`}>
-                                        {step.type}
-                                    </span>
+                                                        <span className="font-semibold text-gray-800 dark:text-gray-200">{step.tool}</span>
+                                                        <span className={`text-xs font-mono px-2 py-0.5 rounded-full ${step.type === 'Frontend' ? 'bg-indigo-100 text-indigo-800' : 'bg-green-100 text-green-800'}`}>
+        {step.type}
+      </span>
                                                         <button onClick={() => toggleStep(index)}
                                                                 className="text-sm text-blue-600 hover:underline">
-                                                            {expandedSteps.has(index) ? 'Hide Code' : 'Show Code'}
+                                                            {expandedSteps.has(index) ? 'Hide Details' : 'Show Details'}
                                                         </button>
                                                     </div>
                                                     <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{step.description}</p>
 
-                                                    {step.output && (
-                                                        <div className="mt-3">
-                                                            <h6 className="text-xs font-semibold text-green-600 uppercase">Output
-                                                                (terminal)</h6>
-                                                            <pre
-                                                                className="mt-1 text-xs bg-gray-900 dark:bg-black/50 text-white p-3 rounded-md overflow-x-auto">
-                                          <code>{step.output}</code>
-                                        </pre>
-                                                        </div>
-                                                    )}
-
                                                     {expandedSteps.has(index) && (
-                                                        <div className="mt-3">
-                                                            <h6 className="text-xs font-semibold text-gray-500 uppercase">Code</h6>
-                                                            <pre
-                                                                className="mt-1 text-xs bg-gray-100 dark:bg-white/5 dark:text-gray-200 p-2 rounded-md overflow-x-auto">
-                           <code>{step.code}</code>
-                         </pre>
+                                                        <div className="mt-3 space-y-3">
+                                                            {/* Console */}
+                                                            <div>
+                                                                <h6 className="text-xs font-semibold text-gray-500 uppercase">Console (Mock)</h6>
+                                                                <pre className="mt-1 text-xs bg-gray-900 dark:bg-black/50 text-white p-3 rounded-md overflow-x-auto">
+            <code>{step.output || 'Preview will appear here after execution.'}</code>
+          </pre>
+                                                            </div>
+
+                                                            {/* Code */}
+                                                            <div>
+                                                                <h6 className="text-xs font-semibold text-gray-500 uppercase">Code</h6>
+                                                                <pre className="mt-1 text-xs bg-gray-100 dark:bg-white/5 dark:text-gray-200 p-2 rounded-md overflow-x-auto">
+            <code>{step.code || 'Code snippet unavailable.'}</code>
+          </pre>
+                                                            </div>
+
+                                                            {/* Execute Button */}
+                                                            <div className="flex justify-end">
+                                                                <button
+                                                                    disabled={executionLevel === 'Mock'}
+                                                                    className={`px-3 py-1.5 text-xs font-semibold rounded-md ${
+                                                                        executionLevel === 'Mainnet'
+                                                                            ? 'bg-green-600 text-white'
+                                                                            : executionLevel === 'Testnet'
+                                                                                ? 'bg-yellow-500 text-black'
+                                                                                : executionLevel === 'Read-only'
+                                                                                    ? 'bg-blue-500 text-white'
+                                                                                    : 'bg-gray-300 dark:bg-gray-700 text-gray-600 dark:text-gray-400 cursor-not-allowed'
+                                                                    }`}
+                                                                >
+                                                                    Execute ({executionLevel})
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     )}
                                                 </div>
